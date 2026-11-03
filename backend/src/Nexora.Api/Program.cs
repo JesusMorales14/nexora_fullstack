@@ -1,3 +1,5 @@
+using Nexora.Infrastructure;
+using Nexora.Infrastructure.Persistence;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +15,10 @@ builder.Services.AddProblemDetails(options =>
         context.ProblemDetails.Extensions["traceId"] = context.HttpContext.TraceIdentifier;
 });
 
-builder.Services.AddHealthChecks();
+builder.Services.AddInfrastructure();
+
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<NexoraDbContext>("database");
 
 var app = builder.Build();
 
@@ -26,6 +31,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
+    await app.Services.InitializeDatabaseAsync(seedSampleData: true);
 }
 
 app.MapHealthChecks("/health");
