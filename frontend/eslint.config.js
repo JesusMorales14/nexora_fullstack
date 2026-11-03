@@ -34,6 +34,12 @@ export default defineConfig([
     },
   },
   {
+    // RTK Query documents `build.query<Result, void>` for endpoints without arguments,
+    // which lets callers write `useGetBrandsQuery()` instead of `useGetBrandsQuery(undefined)`.
+    files: ['src/features/*/api/*.ts'],
+    rules: { '@typescript-eslint/no-invalid-void-type': 'off' },
+  },
+  {
     // shadcn/ui components co-export their `cva` variants (e.g. buttonVariants) by design.
     // The only cost is a full reload instead of fast refresh when editing these files.
     files: ['src/components/ui/**/*.tsx'],

@@ -1,7 +1,7 @@
-import { LayoutDashboard } from 'lucide-react'
+﻿import { LayoutDashboard } from 'lucide-react'
 import { Link, NavLink, Outlet } from 'react-router'
 
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/utils/cn'
 
 // TODO(fase-5): guard with the authenticated user's role. This is UX only;
 // the API remains the authority that rejects unauthorized requests.

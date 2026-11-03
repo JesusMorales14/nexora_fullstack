@@ -1,7 +1,8 @@
-import { ShoppingCart } from 'lucide-react'
+﻿import { ShoppingCart } from 'lucide-react'
 import { Link, NavLink, Outlet, ScrollRestoration } from 'react-router'
 
-import { cn } from '@/lib/utils'
+import { SearchForm } from '@/features/products/components/SearchForm'
+import { cn } from '@/lib/utils/cn'
 
 const MAIN_CONTENT_ID = 'main-content'
 
@@ -23,13 +24,17 @@ export function StorefrontLayout() {
       </a>
 
       <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 sm:px-6">
           <Link to="/" className="text-xl font-bold tracking-tight">
             Nexora
           </Link>
 
-          <nav aria-label="Principal" className="flex items-center gap-1">
-            <NavLink to="/products" className={navLinkClassName}>
+          <div className="order-last w-full sm:order-none sm:max-w-md sm:flex-1">
+            <SearchForm />
+          </div>
+
+          <nav aria-label="Principal" className="ml-auto flex items-center gap-1">
+            <NavLink to="/products" end className={navLinkClassName}>
               Catálogo
             </NavLink>
             <NavLink to="/cart" className={navLinkClassName} aria-label="Carrito de compras">
