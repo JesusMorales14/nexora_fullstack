@@ -1,0 +1,9 @@
+/* Temporary base styles. Replaced by Tailwind and Nexora design tokens in task 1.2. */
+:root {
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+body {
+  margin: 0;
+}

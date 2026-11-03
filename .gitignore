@@ -1,0 +1,38 @@
+# --- Node / frontend ---
+node_modules/
+dist/
+dist-ssr/
+coverage/
+*.tsbuildinfo
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# --- .NET / backend ---
+bin/
+obj/
+*.user
+*.suo
+.vs/
+TestResults/
+
+# --- Environment & secrets ---
+# Only example files are versioned. Real values live in user-secrets or CI secrets.
+.env
+.env.*
+!.env.example
+*.local
+appsettings.*.local.json
+
+# --- Editors / OS ---
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+.DS_Store
+Thumbs.db
+*.sw?
+
+# --- Playwright (future) ---
+playwright-report/
+test-results/
