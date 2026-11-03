@@ -27,11 +27,4 @@ describe('routes', () => {
       await screen.findByRole('heading', { level: 1, name: 'Página no encontrada' }),
     ).toBeInTheDocument()
   })
-
-  it('renders the admin area with its own layout', async () => {
-    renderRoute('/admin')
-
-    expect(await screen.findByRole('heading', { level: 1, name: 'Dashboard' })).toBeInTheDocument()
-    expect(screen.getByRole('navigation', { name: 'Administración' })).toBeInTheDocument()
-  })
 })

@@ -2,6 +2,7 @@
 import { Link, NavLink, Outlet, ScrollRestoration } from 'react-router'
 
 import { SearchForm } from '@/features/products/components/SearchForm'
+import { AccountNavLink } from '@/layouts/AccountNavLink'
 import { cn } from '@/lib/utils/cn'
 
 const MAIN_CONTENT_ID = 'main-content'
@@ -37,6 +38,7 @@ export function StorefrontLayout() {
             <NavLink to="/products" end className={navLinkClassName}>
               Catálogo
             </NavLink>
+            <AccountNavLink className={navLinkClassName} />
             <NavLink to="/cart" className={navLinkClassName} aria-label="Carrito de compras">
               <ShoppingCart aria-hidden="true" className="size-5" />
             </NavLink>

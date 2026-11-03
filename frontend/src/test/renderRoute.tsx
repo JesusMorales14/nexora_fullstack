@@ -1,6 +1,7 @@
 import { render } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import { createMemoryRouter, RouterProvider } from 'react-router'
+import { createMemoryRouter } from 'react-router'
+import { RouterProvider } from 'react-router/dom'
 
 import { routes } from '@/app/router/routes'
 import { makeStore } from '@/app/store/store'

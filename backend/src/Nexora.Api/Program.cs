@@ -30,7 +30,7 @@ builder.Services.AddOptions<FrontendOptions>()
     .ValidateOnStart();
 
 builder.Services.AddInfrastructure();
-builder.Services.AddNexoraAuth(builder.Configuration);
+builder.Services.AddNexoraAuth(builder.Configuration, builder.Environment);
 
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<NexoraDbContext>("database");

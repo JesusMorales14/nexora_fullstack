@@ -1,4 +1,5 @@
-import { RouterProvider } from 'react-router'
+// The DOM build wires ReactDOM.flushSync, needed by `navigate(..., { flushSync: true })`.
+import { RouterProvider } from 'react-router/dom'
 
 import { AppProviders } from '@/app/providers/AppProviders'
 import { router } from '@/app/router/router'

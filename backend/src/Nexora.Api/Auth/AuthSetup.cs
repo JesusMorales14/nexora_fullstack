@@ -16,16 +16,24 @@ public static class AuthSetup
     public const string CorsPolicy = "storefront";
     public const string CsrfHeaderName = "X-XSRF-TOKEN";
 
-    private const string SessionCookieName = "__Host-nexora-session";
-    private const string AntiforgeryCookieName = "__Host-nexora-csrf";
-
     /// <summary>
     /// Cookie-based session auth with ASP.NET Core Identity (see ADR-0005):
     /// HttpOnly + Secure + SameSite=Lax session cookie, antiforgery header for unsafe methods,
     /// lockout and rate limiting against brute force.
     /// </summary>
-    public static IServiceCollection AddNexoraAuth(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddNexoraAuth(
+        this IServiceCollection services,
+        IConfiguration configuration,
+        IHostEnvironment environment)
     {
+        ArgumentNullException.ThrowIfNull(environment);
+
+        // Local development runs over plain HTTP (browser → Vite proxy → API). Everywhere else,
+        // including the integration tests, cookies are Secure and use the __Host- prefix
+        // (which browsers only accept on Secure cookies with Path=/ and no Domain).
+        var isPlainHttpDevelopment = environment.IsDevelopment();
+        var cookieSecurePolicy = isPlainHttpDevelopment ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
+        var cookiePrefix = isPlainHttpDevelopment ? string.Empty : "__Host-";
         services.AddIdentityCore<ApplicationUser>(options =>
             {
                 // NIST SP 800-63B: favour length over composition rules.
@@ -58,9 +66,9 @@ public static class AuthSetup
         services.AddAuthentication(IdentityConstants.ApplicationScheme).AddIdentityCookies();
         services.ConfigureApplicationCookie(options =>
         {
-            options.Cookie.Name = SessionCookieName;
+            options.Cookie.Name = $"{cookiePrefix}nexora-session";
             options.Cookie.HttpOnly = true;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SecurePolicy = cookieSecurePolicy;
             options.Cookie.SameSite = SameSiteMode.Lax;
             options.ExpireTimeSpan = TimeSpan.FromDays(7);
             options.SlidingExpiration = true;
@@ -84,9 +92,9 @@ public static class AuthSetup
         services.AddAntiforgery(options =>
         {
             options.HeaderName = CsrfHeaderName;
-            options.Cookie.Name = AntiforgeryCookieName;
+            options.Cookie.Name = $"{cookiePrefix}nexora-csrf";
             options.Cookie.HttpOnly = true;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SecurePolicy = cookieSecurePolicy;
             options.Cookie.SameSite = SameSiteMode.Strict;
         });
 

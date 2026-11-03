@@ -1,10 +1,10 @@
-﻿import { LayoutDashboard } from 'lucide-react'
+﻿import { LayoutDashboard, Store } from 'lucide-react'
 import { Link, NavLink, Outlet } from 'react-router'
 
 import { cn } from '@/lib/utils/cn'
 
-// TODO(fase-5): guard with the authenticated user's role. This is UX only;
-// the API remains the authority that rejects unauthorized requests.
+// Rendered behind RequireAdmin (routes.tsx). That guard is UX only: every admin endpoint
+// is protected by the AdminOnly policy in the API.
 export function AdminLayout() {
   return (
     <div className="flex min-h-dvh flex-col bg-muted/40 md:flex-row">
@@ -28,6 +28,13 @@ export function AdminLayout() {
             <LayoutDashboard aria-hidden="true" className="size-4" />
             Dashboard
           </NavLink>
+          <Link
+            to="/"
+            className="flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-sidebar-accent md:mt-4"
+          >
+            <Store aria-hidden="true" className="size-4" />
+            Ver tienda
+          </Link>
         </nav>
       </aside>
 

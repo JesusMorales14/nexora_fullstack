@@ -27,6 +27,14 @@ export const defaultHandlers = [
   ),
   http.get(apiUrl('categories'), () => HttpResponse.json(categoriesFixture)),
   http.get(apiUrl('brands'), () => HttpResponse.json(brandsFixture)),
+  // Anonymous visitor by default; tests sign in with `server.use(signedInAs(...))`.
+  http.get(apiUrl('auth/me'), () =>
+    HttpResponse.json(
+      { title: 'Unauthorized', status: 401 },
+      { status: 401, headers: { 'Content-Type': 'application/problem+json' } },
+    ),
+  ),
+  http.get(apiUrl('auth/csrf'), () => HttpResponse.json({ token: 'test-csrf-token' })),
 ]
 
 export const server = setupServer(...defaultHandlers)

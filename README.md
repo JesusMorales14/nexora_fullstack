@@ -3,8 +3,8 @@
 E-commerce de tecnología para el mercado peruano (precios en soles, IGV incluido).
 Proyecto de portafolio: storefront + panel administrativo sobre una API REST propia.
 
-> Estado: **Fases 1–4 (catálogo).** Storefront con catálogo, búsqueda, filtros y detalle de
-> producto conectado a la API. Pendiente: autenticación, carrito, checkout y panel admin.
+> Estado: **Fases 1–5.** Catálogo con búsqueda, filtros y detalle; registro, login, recuperación de
+> contraseña, roles y dashboard admin protegido. Pendiente: carrito, checkout, CRUD admin.
 
 ## Stack
 
@@ -49,7 +49,8 @@ docker compose up -d
 ```
 
 El contenedor expone PostgreSQL solo en `127.0.0.1:5433` (5433 para no chocar con un PostgreSQL
-instalado localmente).
+instalado localmente). También levanta **MailPit**, que captura los correos de desarrollo
+(recuperación de contraseña): http://localhost:8025
 
 ### 2. API
 
@@ -59,10 +60,15 @@ La cadena de conexión es un secreto local y se guarda con `dotnet user-secrets`
 cd backend
 dotnet tool restore
 dotnet user-secrets set "ConnectionStrings:Nexora" "Host=localhost;Port=5433;Database=nexora;Username=nexora;Password=<tu-password>" --project src/Nexora.Api
+# Opcional: administrador inicial (solo se crea si no existe)
+dotnet user-secrets set "Seed:Admin:Email" "admin@nexora.local" --project src/Nexora.Api
+dotnet user-secrets set "Seed:Admin:Password" "<una-clave-de-al-menos-10-caracteres>" --project src/Nexora.Api
 dotnet run --project src/Nexora.Api
 ```
 
-En `Development` la API aplica las migraciones y carga un catálogo de ejemplo al iniciar.
+En `Development` la API aplica las migraciones, carga un catálogo de ejemplo y crea el
+administrador configurado al iniciar. `dotnet user-secrets list --project src/Nexora.Api` muestra los
+valores guardados.
 
 - API: http://localhost:5080/api/v1/products
 - Documentación OpenAPI (Scalar): http://localhost:5080/scalar
@@ -98,8 +104,17 @@ GitHub Actions ejecuta todo lo anterior en cada push y pull request.
 | GET    | `/api/v1/products/{slug}`| Detalle de un producto publicado                                            |
 | GET    | `/api/v1/categories`     | Categorías (con `parentSlug`)                                               |
 | GET    | `/api/v1/brands`         | Marcas                                                                      |
+| GET    | `/api/v1/auth/csrf`      | Token antiforgery para enviar en `X-XSRF-TOKEN`                             |
+| GET    | `/api/v1/auth/me`        | Usuario de la sesión (401 si es anónimo)                                    |
+| POST   | `/api/v1/auth/register`  | Crea la cuenta (rol Customer) e inicia sesión                               |
+| POST   | `/api/v1/auth/login`     | Inicia sesión (cookie HttpOnly)                                             |
+| POST   | `/api/v1/auth/logout`    | Cierra la sesión                                                            |
+| POST   | `/api/v1/auth/forgot-password` | Envía el enlace de recuperación (siempre 202)                         |
+| POST   | `/api/v1/auth/reset-password`  | Cambia la contraseña con el token del correo                          |
+| GET    | `/api/v1/admin/summary`  | Indicadores del dashboard (rol Admin)                                       |
 
-Los errores se devuelven como Problem Details (RFC 9457) con `traceId`.
+Los errores se devuelven como Problem Details (RFC 9457) con `traceId`. Todo `POST/PUT/PATCH/DELETE`
+requiere la cabecera `X-XSRF-TOKEN`; los endpoints de auth tienen rate limiting por IP.
 
 ## Variables de entorno
 
@@ -107,6 +122,10 @@ Los errores se devuelven como Problem Details (RFC 9457) con `traceId`.
 | ------------------------ | ------------------ | ---------------------------------------------- |
 | `POSTGRES_*`             | `.env` (raíz)      | Credenciales del contenedor local              |
 | `ConnectionStrings:Nexora` | user-secrets     | Conexión de la API a PostgreSQL                |
+| `Seed:Admin:*`           | user-secrets       | Administrador inicial (solo Development)       |
+| `Frontend:BaseUrl`       | appsettings / entorno | URL pública de la tienda (enlaces de correo) |
+| `Frontend:AllowedCorsOrigins` | entorno       | Orígenes con CORS + credenciales (producción)  |
+| `Email:Smtp:*`           | appsettings / secretos | Servidor SMTP (`Password` siempre como secreto) |
 | `VITE_API_BASE_URL`      | `frontend/.env.local` | URL pública de la API (por defecto `/api/v1`) |
 
 Todo `VITE_*` termina en el navegador: nunca contiene secretos.
@@ -117,3 +136,4 @@ Todo `VITE_*` termina en el navegador: nunca contiene secretos.
 - [ADR-0002 — Moneda (PEN) e IGV](docs/adr/0002-currency-and-tax.md)
 - [ADR-0003 — Herramientas de lint y versión de TypeScript](docs/adr/0003-lint-tooling-and-typescript-version.md)
 - [ADR-0004 — Arquitectura del catálogo](docs/adr/0004-catalog-architecture.md)
+- [ADR-0005 — Autenticación, sesiones y CSRF](docs/adr/0005-authentication-and-sessions.md)
