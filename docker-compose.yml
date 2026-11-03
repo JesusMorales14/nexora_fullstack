@@ -23,5 +23,14 @@ services:
       timeout: 5s
       retries: 10
 
+  # Local SMTP server that captures every email (password resets...). Web UI: http://localhost:8025
+  mailpit:
+    image: axllent/mailpit:v1.33.0
+    container_name: nexora-mailpit
+    restart: unless-stopped
+    ports:
+      - '127.0.0.1:1025:1025'
+      - '127.0.0.1:8025:8025'
+
 volumes:
   nexora-postgres-data:

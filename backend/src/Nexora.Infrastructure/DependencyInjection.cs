@@ -1,9 +1,15 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Nexora.Application.Admin;
+using Nexora.Application.Auth;
 using Nexora.Application.Catalog;
+using Nexora.Infrastructure.Admin;
 using Nexora.Infrastructure.Catalog;
+using Nexora.Infrastructure.Email;
+using Nexora.Infrastructure.Identity;
 using Nexora.Infrastructure.Persistence;
 using Nexora.Infrastructure.Persistence.Seeding;
 
@@ -12,6 +18,7 @@ namespace Nexora.Infrastructure;
 public static class DependencyInjection
 {
     public const string ConnectionStringName = "Nexora";
+    public const string AdminSeedSectionName = "Seed:Admin";
 
     public static IServiceCollection AddInfrastructure(this IServiceCollection services)
     {
@@ -27,7 +34,14 @@ public static class DependencyInjection
             options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention();
         });
 
+        services.AddOptions<SmtpOptions>()
+            .BindConfiguration(SmtpOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         services.AddScoped<IProductCatalog, ProductCatalog>();
+        services.AddScoped<IAdminDashboard, AdminDashboard>();
+        services.AddScoped<IAccountEmailSender, SmtpAccountEmailSender>();
 
         return services;
     }
@@ -42,13 +56,24 @@ public static class DependencyInjection
         CancellationToken cancellationToken = default)
     {
         await using var scope = services.CreateAsyncScope();
-        var db = scope.ServiceProvider.GetRequiredService<NexoraDbContext>();
+        var provider = scope.ServiceProvider;
+        var db = provider.GetRequiredService<NexoraDbContext>();
+        var timeProvider = provider.GetRequiredService<TimeProvider>();
 
         await db.Database.MigrateAsync(cancellationToken);
 
-        if (seedSampleData)
+        if (!seedSampleData)
         {
-            await CatalogSeeder.SeedAsync(db, scope.ServiceProvider.GetRequiredService<TimeProvider>(), cancellationToken);
+            return;
+        }
+
+        await CatalogSeeder.SeedAsync(db, timeProvider, cancellationToken);
+
+        var adminSeed = provider.GetRequiredService<IConfiguration>().GetSection(AdminSeedSectionName);
+        if (adminSeed["Email"] is { Length: > 0 } adminEmail && adminSeed["Password"] is { Length: > 0 } adminPassword)
+        {
+            await IdentitySeeder.EnsureAdminAsync(
+                provider.GetRequiredService<UserManager<ApplicationUser>>(), adminEmail, adminPassword, timeProvider);
         }
     }
 }

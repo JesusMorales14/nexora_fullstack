@@ -16,6 +16,12 @@
     <PackageVersion Include="EFCore.NamingConventions" Version="10.0.1" />
   </ItemGroup>
 
+  <ItemGroup Label="Identity and email">
+    <PackageVersion Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.14" />
+    <PackageVersion Include="Microsoft.AspNetCore.DataProtection.EntityFrameworkCore" Version="10.0.14" />
+    <PackageVersion Include="MailKit" Version="4.18.2" />
+  </ItemGroup>
+
   <ItemGroup Label="Testing">
     <!-- xUnit v3 runs on Microsoft.Testing.Platform (see global.json): no VSTest packages needed. -->
     <PackageVersion Include="xunit.v3" Version="4.0.2" />
