@@ -1,11 +1,12 @@
 import { fileURLToPath, URL } from 'node:url'
 
+import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
 
 // https://vite.dev/config/ — https://vitest.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), tailwindcss()],
   resolve: {
     // Keep in sync with "paths" in tsconfig.app.json: TypeScript only type-checks
     // the alias, Vite is the one that actually resolves it at build/test time.

@@ -34,6 +34,12 @@ export default defineConfig([
     },
   },
   {
+    // shadcn/ui components co-export their `cva` variants (e.g. buttonVariants) by design.
+    // The only cost is a full reload instead of fast refresh when editing these files.
+    files: ['src/components/ui/**/*.tsx'],
+    rules: { 'react-refresh/only-export-components': 'off' },
+  },
+  {
     files: ['*.config.{js,ts}'],
     languageOptions: { globals: globals.node },
   },
