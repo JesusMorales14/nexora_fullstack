@@ -1,8 +1,12 @@
+import { RouterProvider } from 'react-router'
+
+import { AppProviders } from '@/app/providers/AppProviders'
+import { router } from '@/app/router/router'
+
 export function App() {
   return (
-    <main>
-      <h1>Nexora</h1>
-      <p>Tienda de tecnología. Próximamente.</p>
-    </main>
+    <AppProviders>
+      <RouterProvider router={router} />
+    </AppProviders>
   )
 }

@@ -14,6 +14,16 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  server: {
+    // Same-origin API in development: the browser talks to Vite, Vite forwards /api to
+    // ASP.NET Core. This keeps cookies first-party and avoids CORS in dev (see ADR-0001).
+    proxy: {
+      '/api': {
+        target: process.env.NEXORA_API_PROXY_TARGET ?? 'http://localhost:5080',
+        changeOrigin: false,
+      },
+    },
+  },
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
