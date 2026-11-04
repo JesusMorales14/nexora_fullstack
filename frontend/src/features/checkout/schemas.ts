@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from '@/lib/validation/z'
 
 import { PERU_DEPARTMENTS } from '@/features/checkout/peruDepartments'
 

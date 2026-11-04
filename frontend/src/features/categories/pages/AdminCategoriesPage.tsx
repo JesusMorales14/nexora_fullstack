@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Pencil, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { z } from '@/lib/validation/z'
 
 import { ErrorState } from '@/components/shared/ErrorState'
 import { FormAlert } from '@/components/shared/FormAlert'

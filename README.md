@@ -3,10 +3,10 @@
 E-commerce de tecnología para el mercado peruano (precios en soles, IGV incluido).
 Proyecto de portafolio: storefront + panel administrativo sobre una API REST propia.
 
-> Estado: **Fases 1–8.** Tienda completa (catálogo, cuentas, carrito, checkout con pago simulado,
-> pedidos), panel administrativo (productos, categorías, inventario, pedidos, clientes, reportes,
-> administradores, auditoría) y notificaciones en tiempo real con SignalR. Pendiente: calidad y
-> seguridad (fase 9), PWA/SEO y despliegue.
+> Estado: **Fases 1–9.** Tienda completa (catálogo, cuentas, carrito, checkout con pago simulado,
+> pedidos), panel administrativo, notificaciones en tiempo real, y revisión de calidad y seguridad
+> (cabeceras y CSP, permisos verificados por pruebas, E2E con Playwright y axe, Lighthouse).
+> Pendiente: PWA/SEO (fase 10) y despliegue (fase 11).
 
 ## Stack
 
@@ -93,10 +93,21 @@ Abre http://localhost:5173. Vite reenvía `/api` a la API (mismo origen en desar
 | `pnpm lint`            | `dotnet build` (analizadores, warnings = errores) |
 | `pnpm typecheck`       | `dotnet format --verify-no-changes`   |
 | `pnpm format:check`    | `dotnet test` (requiere Docker)       |
-| `pnpm test`            |                                       |
+| `pnpm test`            | `dotnet list package --vulnerable`    |
 | `pnpm build`           |                                       |
+| `pnpm audit:prod`      |                                       |
+| `pnpm test:e2e`        |                                       |
 
-GitHub Actions ejecuta todo lo anterior en cada push y pull request.
+`pnpm test:e2e` ejecuta Playwright (escritorio y móvil, con revisiones WCAG 2.2 AA de axe) contra la
+API real y el build de producción; los levanta si no están corriendo. La primera vez:
+`pnpm exec playwright install chromium`. Para la prueba de administrador, define
+`E2E_ADMIN_EMAIL` y `E2E_ADMIN_PASSWORD` (los mismos que `Seed:Admin:*`).
+
+GitHub Actions ejecuta todo lo anterior en cada push y pull request, más gitleaks (secretos en todo
+el historial). Dependabot propone actualizaciones semanales.
+
+Reportes: [seguridad](docs/quality/security.md) ·
+[rendimiento y accesibilidad](docs/quality/performance-and-accessibility.md).
 
 ## API (v1)
 

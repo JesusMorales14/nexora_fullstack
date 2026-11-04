@@ -3,7 +3,7 @@ import { History, Search, SlidersHorizontal } from 'lucide-react'
 import { type SubmitEvent, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useSearchParams } from 'react-router'
-import { z } from 'zod'
+import { z } from '@/lib/validation/z'
 
 import { EmptyState } from '@/components/shared/EmptyState'
 import { ErrorState } from '@/components/shared/ErrorState'

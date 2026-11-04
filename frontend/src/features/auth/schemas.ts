@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from '@/lib/validation/z'
 
 // Client-side validation is for fast feedback only; the API validates everything again.
 // Limits mirror Nexora.Api.Auth.AuthContracts and the Identity password policy.

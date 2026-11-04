@@ -91,7 +91,15 @@ export function CatalogPage() {
           <CatalogFilters />
         </aside>
 
-        <section aria-label="Productos" aria-busy={isFetching} className="flex flex-col gap-8">
+        <section
+          aria-labelledby="catalog-results-heading"
+          aria-busy={isFetching}
+          className="flex flex-col gap-8"
+        >
+          {/* Keeps the heading outline h1 → h2 → h3 (product cards) for screen reader navigation. */}
+          <h2 id="catalog-results-heading" className="sr-only">
+            Productos
+          </h2>
           {isLoading ? (
             <ProductGridSkeleton count={CATALOG_PAGE_SIZE} />
           ) : isError ? (

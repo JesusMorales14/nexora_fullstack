@@ -30,6 +30,17 @@ export default defineConfig([
     },
     rules: {
       '@typescript-eslint/consistent-type-imports': 'error',
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            {
+              name: 'zod',
+              message: "Import { z } from '@/lib/validation/z' (CSP-safe jitless config).",
+            },
+          ],
+        },
+      ],
       'no-console': ['warn', { allow: ['warn', 'error'] }],
     },
   },
@@ -38,6 +49,11 @@ export default defineConfig([
     // which lets callers write `useGetBrandsQuery()` instead of `useGetBrandsQuery(undefined)`.
     files: ['src/features/**/*Api.ts'],
     rules: { '@typescript-eslint/no-invalid-void-type': 'off' },
+  },
+  {
+    // The one place allowed to import Zod directly.
+    files: ['src/lib/validation/z.ts'],
+    rules: { 'no-restricted-imports': 'off' },
   },
   {
     // shadcn/ui components co-export their `cva` variants (e.g. buttonVariants) by design.

@@ -33,6 +33,7 @@ appsettings.*.local.json
 Thumbs.db
 *.sw?
 
-# --- Playwright (future) ---
+# --- Playwright ---
 playwright-report/
 test-results/
+blob-report/

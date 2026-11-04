@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from '@/lib/validation/z'
 
 import { getOrderStatusLabel } from '@/features/orders/orderStatus'
 import type { OrderStatus } from '@/features/orders/types'
