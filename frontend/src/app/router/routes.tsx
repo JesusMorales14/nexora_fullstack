@@ -186,6 +186,41 @@ export const routes: RouteObject[] = [
             ),
           },
           {
+            path: 'orders',
+            lazy: lazyPage(
+              () => import('@/features/orders/admin/pages/AdminOrdersPage'),
+              (m) => m.AdminOrdersPage,
+            ),
+          },
+          {
+            path: 'orders/:orderNumber',
+            lazy: lazyPage(
+              () => import('@/features/orders/admin/pages/AdminOrderPage'),
+              (m) => m.AdminOrderPage,
+            ),
+          },
+          {
+            path: 'customers',
+            lazy: lazyPage(
+              () => import('@/features/customers/pages/AdminCustomersPage'),
+              (m) => m.AdminCustomersPage,
+            ),
+          },
+          {
+            path: 'administrators',
+            lazy: lazyPage(
+              () => import('@/features/customers/pages/AdministratorsPage'),
+              (m) => m.AdministratorsPage,
+            ),
+          },
+          {
+            path: 'reports',
+            lazy: lazyPage(
+              () => import('@/features/analytics/pages/ReportsPage'),
+              (m) => m.ReportsPage,
+            ),
+          },
+          {
             path: 'audit-log',
             lazy: lazyPage(
               () => import('@/features/audit/pages/AuditLogPage'),

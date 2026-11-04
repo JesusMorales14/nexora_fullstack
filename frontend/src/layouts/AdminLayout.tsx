@@ -1,10 +1,14 @@
 ﻿import {
+  FileSpreadsheet,
   FolderTree,
   History,
   LayoutDashboard,
   type LucideIcon,
   Package,
+  Receipt,
+  ShieldCheck,
   Store,
+  Users,
   Warehouse,
 } from 'lucide-react'
 import { Link, NavLink, Outlet } from 'react-router'
@@ -20,9 +24,13 @@ interface AdminNavItem {
 
 const NAV_ITEMS: AdminNavItem[] = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
+  { to: '/admin/orders', label: 'Pedidos', icon: Receipt },
   { to: '/admin/products', label: 'Productos', icon: Package },
   { to: '/admin/categories', label: 'Categorías', icon: FolderTree },
   { to: '/admin/inventory', label: 'Inventario', icon: Warehouse },
+  { to: '/admin/customers', label: 'Clientes', icon: Users },
+  { to: '/admin/reports', label: 'Reportes', icon: FileSpreadsheet },
+  { to: '/admin/administrators', label: 'Administradores', icon: ShieldCheck },
   { to: '/admin/audit-log', label: 'Auditoría', icon: History },
 ]
 

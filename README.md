@@ -3,9 +3,9 @@
 E-commerce de tecnología para el mercado peruano (precios en soles, IGV incluido).
 Proyecto de portafolio: storefront + panel administrativo sobre una API REST propia.
 
-> Estado: **Fases 1–6.** Catálogo con búsqueda, filtros y detalle; cuentas con roles; carrito,
-> checkout con reserva de stock, pago simulado e historial de pedidos. Pendiente: CRUD admin,
-> tiempo real, PWA/SEO y despliegue.
+> Estado: **Fases 1–7.** Tienda completa (catálogo, cuentas, carrito, checkout con pago simulado,
+> pedidos) y panel administrativo (productos, categorías, inventario con movimientos, pedidos,
+> clientes, reporte CSV, administradores y auditoría). Pendiente: tiempo real, PWA/SEO y despliegue.
 
 ## Stack
 
@@ -118,6 +118,7 @@ GitHub Actions ejecuta todo lo anterior en cada push y pull request.
 | GET    | `/api/v1/orders`         | Pedidos del usuario                                                         |
 | GET    | `/api/v1/orders/{number}`| Detalle (404 si no es del usuario)                                          |
 | POST   | `/api/v1/orders/{number}/simulated-payment` | Aprueba/rechaza el pago (solo con la pasarela simulada) |
+| *      | `/api/v1/admin/...`      | Panel (rol Admin): `products`, `categories`, `brands`, `inventory`, `orders`, `customers`, `reports/orders.csv`, `administrators`, `audit-log`. Detalle en OpenAPI (`/scalar`) |
 
 Los errores se devuelven como Problem Details (RFC 9457) con `traceId`. Todo `POST/PUT/PATCH/DELETE`
 requiere la cabecera `X-XSRF-TOKEN`; los endpoints de auth tienen rate limiting por IP.
@@ -147,3 +148,4 @@ Todo `VITE_*` termina en el navegador: nunca contiene secretos.
 - [ADR-0004 — Arquitectura del catálogo](docs/adr/0004-catalog-architecture.md)
 - [ADR-0005 — Autenticación, sesiones y CSRF](docs/adr/0005-authentication-and-sessions.md)
 - [ADR-0006 — Carrito, checkout, stock y pagos](docs/adr/0006-cart-checkout-and-payments.md)
+- [ADR-0007 — Panel administrativo](docs/adr/0007-admin-panel.md)

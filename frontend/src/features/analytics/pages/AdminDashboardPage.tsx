@@ -1,5 +1,6 @@
 import { AlertTriangle, Package, PackageX, Users } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
+import { Link } from 'react-router'
 
 import { ErrorState } from '@/components/shared/ErrorState'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -65,6 +66,15 @@ export function AdminDashboardPage() {
             <StatCard label="Clientes" value={summary.customers} icon={Users} />
           </div>
         )
+      )}
+
+      {summary && summary.lowStockVariants + summary.outOfStockVariants > 0 && (
+        <Link
+          to="/admin/inventory?lowStock=true"
+          className="self-start text-sm font-medium text-primary hover:underline"
+        >
+          Revisar el stock bajo en Inventario →
+        </Link>
       )}
     </div>
   )
