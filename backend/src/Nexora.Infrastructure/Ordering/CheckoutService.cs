@@ -187,7 +187,7 @@ internal sealed class CheckoutService(
 
         if (IsPaymentWindowOver(order, now))
         {
-            await ReleaseReservationAsync(order, cancellationToken);
+            await StockReservations.ReleaseAsync(db, order, cancellationToken);
             order.Cancel(now);
             outcome = PaymentConfirmationOutcome.Expired;
         }
@@ -219,7 +219,7 @@ internal sealed class CheckoutService(
         }
         else
         {
-            await ReleaseReservationAsync(order, cancellationToken);
+            await StockReservations.ReleaseAsync(db, order, cancellationToken);
             order.MarkPaymentFailed(now);
             outcome = PaymentConfirmationOutcome.Rejected;
         }
@@ -257,7 +257,7 @@ internal sealed class CheckoutService(
             await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
             try
             {
-                await ReleaseReservationAsync(order, cancellationToken);
+                await StockReservations.ReleaseAsync(db, order, cancellationToken);
                 order.Cancel(now);
                 await db.SaveChangesAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
@@ -276,16 +276,6 @@ internal sealed class CheckoutService(
 
     private bool IsPaymentWindowOver(Order order, DateTimeOffset now) =>
         order.CreatedAt.AddMinutes(paymentOptions.Value.PendingPaymentTimeoutMinutes) < now;
-
-    private async Task ReleaseReservationAsync(Order order, CancellationToken cancellationToken)
-    {
-        foreach (var item in order.Items)
-        {
-            await db.InventoryItems
-                .Where(inventory => inventory.VariantId == item.VariantId && inventory.Reserved >= item.Quantity)
-                .ExecuteUpdateAsync(setters => setters.SetProperty(inventory => inventory.Reserved, inventory => inventory.Reserved - item.Quantity), cancellationToken);
-        }
-    }
 
     private Task<Order?> FindByIdempotencyKeyAsync(Guid userId, Guid idempotencyKey, CancellationToken cancellationToken) =>
         db.Orders
