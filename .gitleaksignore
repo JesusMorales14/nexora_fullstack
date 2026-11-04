@@ -1,0 +1,5 @@
+# Reviewed false positives (gitleaks fingerprints). Each entry needs a reason.
+#
+# Fixed password for throwaway accounts the E2E tests register on a local/CI database. It protects
+# nothing; since then the password is generated per run (frontend/e2e/support.ts).
+726c37c4b6fe9753bdd2ba9eef6b3f721fa3e5f2:frontend/e2e/support.ts:generic-api-key:8

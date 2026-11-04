@@ -5,7 +5,8 @@ export function uniqueEmail(prefix = 'e2e') {
   return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}@nexora.test`
 }
 
-export const E2E_PASSWORD = 'clave-e2e-suficientemente-larga'
+/** Random per run (like the backend tests): no credential, not even a test one, lives in the repo. */
+export const E2E_PASSWORD = `e2e-${crypto.randomUUID()}`
 
 /** Collects Content-Security-Policy violations so a test can assert the page triggered none. */
 export async function trackCspViolations(page: Page): Promise<string[]> {
