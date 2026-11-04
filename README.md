@@ -3,9 +3,10 @@
 E-commerce de tecnología para el mercado peruano (precios en soles, IGV incluido).
 Proyecto de portafolio: storefront + panel administrativo sobre una API REST propia.
 
-> Estado: **Fases 1–7.** Tienda completa (catálogo, cuentas, carrito, checkout con pago simulado,
-> pedidos) y panel administrativo (productos, categorías, inventario con movimientos, pedidos,
-> clientes, reporte CSV, administradores y auditoría). Pendiente: tiempo real, PWA/SEO y despliegue.
+> Estado: **Fases 1–8.** Tienda completa (catálogo, cuentas, carrito, checkout con pago simulado,
+> pedidos), panel administrativo (productos, categorías, inventario, pedidos, clientes, reportes,
+> administradores, auditoría) y notificaciones en tiempo real con SignalR. Pendiente: calidad y
+> seguridad (fase 9), PWA/SEO y despliegue.
 
 ## Stack
 
@@ -149,3 +150,4 @@ Todo `VITE_*` termina en el navegador: nunca contiene secretos.
 - [ADR-0005 — Autenticación, sesiones y CSRF](docs/adr/0005-authentication-and-sessions.md)
 - [ADR-0006 — Carrito, checkout, stock y pagos](docs/adr/0006-cart-checkout-and-payments.md)
 - [ADR-0007 — Panel administrativo](docs/adr/0007-admin-panel.md)
+- [ADR-0008 — Notificaciones en tiempo real (SignalR)](docs/adr/0008-realtime-notifications.md)

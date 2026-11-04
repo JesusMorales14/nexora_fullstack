@@ -14,6 +14,7 @@ import {
   type AdminOrderListParams,
   useGetAdminOrdersQuery,
 } from '@/features/orders/admin/adminOrdersApi'
+import { useFallbackPolling } from '@/features/notifications/useFallbackPolling'
 import { OrderStatusBadge } from '@/features/orders/components/OrderStatusBadge'
 import { ORDER_STATUS_PRESENTATION } from '@/features/orders/orderStatus'
 import type { OrderStatus } from '@/features/orders/types'
@@ -26,8 +27,11 @@ import { formatPrice } from '@/lib/utils/formatPrice'
 const STATUSES = Object.keys(ORDER_STATUS_PRESENTATION) as OrderStatus[]
 
 export function AdminOrdersPage() {
+  const pollingInterval = useFallbackPolling()
   const [filters, setFilters] = useState<AdminOrderListParams>({ page: 1 })
-  const { data, error, isLoading, isFetching, isError, refetch } = useGetAdminOrdersQuery(filters)
+  const { data, error, isLoading, isFetching, isError, refetch } = useGetAdminOrdersQuery(filters, {
+    pollingInterval,
+  })
 
   function handleSearch(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()

@@ -6,6 +6,7 @@ import { NotFoundPage } from '@/components/shared/NotFoundPage'
 import { PageLoader } from '@/components/shared/PageLoader'
 import { RouteErrorBoundary } from '@/components/shared/RouteErrorBoundary'
 import { HomePage } from '@/features/home/pages/HomePage'
+import { AppShell } from '@/layouts/AppShell'
 import { StorefrontLayout } from '@/layouts/StorefrontLayout'
 
 /** Code-splits a page while keeping named exports (no default exports needed). */
@@ -18,7 +19,7 @@ function lazyPage<TModule>(load: () => Promise<TModule>, pick: (module: TModule)
  * Home and the storefront shell are eager because they are the most common entry point;
  * every other page is code-split so the first load stays small.
  */
-export const routes: RouteObject[] = [
+const appRoutes: RouteObject[] = [
   {
     path: '/',
     Component: StorefrontLayout,
@@ -233,3 +234,6 @@ export const routes: RouteObject[] = [
     ],
   },
 ]
+
+/** Pathless root: AppShell hosts the realtime connection and notifications for every page. */
+export const routes: RouteObject[] = [{ Component: AppShell, children: appRoutes }]

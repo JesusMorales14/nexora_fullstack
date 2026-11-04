@@ -35,6 +35,10 @@ export const defaultHandlers = [
     ),
   ),
   http.get(apiUrl('auth/csrf'), () => HttpResponse.json({ token: 'test-csrf-token' })),
+  // No realtime server in unit tests: negotiation fails and the app falls back to polling.
+  http.post('http://localhost:3000/hubs/notifications/negotiate', () =>
+    HttpResponse.json({ title: 'Unavailable' }, { status: 503 }),
+  ),
 ]
 
 export const server = setupServer(...defaultHandlers)

@@ -5,6 +5,7 @@ import { ErrorState } from '@/components/shared/ErrorState'
 import { NotFoundPage } from '@/components/shared/NotFoundPage'
 import { PageLoader } from '@/components/shared/PageLoader'
 import { Button } from '@/components/ui/button'
+import { useFallbackPolling } from '@/features/notifications/useFallbackPolling'
 import { useGetOrderQuery } from '@/features/orders/api/ordersApi'
 import { OrderDetails } from '@/features/orders/components/OrderDetails'
 import { getErrorMessage, getHttpStatus } from '@/lib/api/apiErrors'
@@ -17,8 +18,15 @@ interface OrderPageProps {
 }
 
 export function OrderPage({ isConfirmation = false }: OrderPageProps) {
+  const pollingInterval = useFallbackPolling()
   const { orderNumber = '' } = useParams()
-  const { data: order, error, isLoading, isError, refetch } = useGetOrderQuery(orderNumber)
+  const {
+    data: order,
+    error,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetOrderQuery(orderNumber, { pollingInterval })
 
   if (isLoading) return <PageLoader />
   if (isError) {

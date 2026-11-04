@@ -22,6 +22,12 @@ export default defineConfig({
         target: process.env.NEXORA_API_PROXY_TARGET ?? 'http://localhost:5080',
         changeOrigin: false,
       },
+      // SignalR hub (WebSockets, with long polling as transport fallback).
+      '/hubs': {
+        target: process.env.NEXORA_API_PROXY_TARGET ?? 'http://localhost:5080',
+        changeOrigin: false,
+        ws: true,
+      },
     },
   },
   test: {

@@ -13,6 +13,7 @@
 } from 'lucide-react'
 import { Link, NavLink, Outlet } from 'react-router'
 
+import { RealtimeIndicator } from '@/features/notifications/components/RealtimeIndicator'
 import { cn } from '@/lib/utils/cn'
 
 interface AdminNavItem {
@@ -83,6 +84,9 @@ export function AdminLayout() {
             Ver tienda
           </Link>
         </nav>
+        <div className="pb-3 md:mt-4">
+          <RealtimeIndicator />
+        </div>
       </aside>
 
       <main

@@ -4,6 +4,7 @@ import { Link } from 'react-router'
 
 import { ErrorState } from '@/components/shared/ErrorState'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useFallbackPolling } from '@/features/notifications/useFallbackPolling'
 import { useGetAdminSummaryQuery } from '@/features/analytics/api/adminApi'
 import { getErrorMessage } from '@/lib/api/apiErrors'
 
@@ -28,7 +29,14 @@ function StatCard({ label, value, detail, icon: Icon }: StatCardProps) {
 }
 
 export function AdminDashboardPage() {
-  const { data: summary, error, isLoading, isError, refetch } = useGetAdminSummaryQuery()
+  const pollingInterval = useFallbackPolling()
+  const {
+    data: summary,
+    error,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetAdminSummaryQuery(undefined, { pollingInterval })
 
   return (
     <div className="flex flex-col gap-6">

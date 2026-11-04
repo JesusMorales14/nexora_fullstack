@@ -3,9 +3,10 @@ import { setupListeners } from '@reduxjs/toolkit/query'
 
 import { cartSlice } from '@/features/cart/cartSlice'
 import { loadCart, saveCart } from '@/features/cart/cartStorage'
+import { notificationsSlice } from '@/features/notifications/notificationsSlice'
 import { baseApi } from '@/lib/api/baseApi'
 
-const rootReducer = combineSlices(baseApi, cartSlice)
+const rootReducer = combineSlices(baseApi, cartSlice, notificationsSlice)
 
 export type RootState = ReturnType<typeof rootReducer>
 
