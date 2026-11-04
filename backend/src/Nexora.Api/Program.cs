@@ -14,6 +14,14 @@ using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    // The API only receives small JSON bodies (no file uploads): reject anything larger early.
+    options.Limits.MaxRequestBodySize = 1_048_576;
+    // Do not advertise the server software.
+    options.AddServerHeader = false;
+});
+
 builder.Services.AddControllers(options =>
     {
         // CSRF defense for cookie auth: every POST/PUT/PATCH/DELETE must carry a valid antiforgery token.
@@ -38,6 +46,7 @@ builder.Services.AddOptions<FrontendOptions>()
     .ValidateDataAnnotations()
     .ValidateOnStart();
 
+builder.Services.AddExceptionHandler<BadHttpRequestExceptionHandler>();
 builder.Services.AddExceptionHandler<DomainExceptionHandler>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
@@ -53,8 +62,17 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
+app.UseMiddleware<SecurityHeadersMiddleware>();
+
 // Unhandled exceptions become a generic 500 Problem Details: no stack traces leak to clients.
 app.UseExceptionHandler();
+
+if (!app.Environment.IsDevelopment())
+{
+    // Development runs over plain HTTP behind the Vite proxy; everywhere else HTTPS is mandatory.
+    app.UseHsts();
+    app.UseHttpsRedirection();
+}
 // Empty 4xx responses (unknown routes, 401/403, antiforgery failures) get a Problem Details body.
 app.UseStatusCodePages();
 
