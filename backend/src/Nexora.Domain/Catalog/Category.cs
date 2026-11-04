@@ -22,6 +22,31 @@ public sealed class Category
         ParentId = parent?.Id;
     }
 
+    /// <summary>
+    /// The catalog has two levels (e.g. Periféricos → Teclados): a parent must be a top-level
+    /// category, which also rules out cycles.
+    /// </summary>
+    public void Update(string name, string slug, Category? parent, bool hasChildren)
+    {
+        if (parent is not null)
+        {
+            if (parent.Id == Id || parent.ParentId is not null)
+            {
+                throw new DomainException("A category can only be nested under a top-level category.");
+            }
+
+            if (hasChildren)
+            {
+                throw new DomainException("A category with subcategories cannot become a subcategory.");
+            }
+        }
+
+        Name = Guard.RequiredText(name, NameMaxLength, "Category name");
+        Slug = Guard.Slug(slug);
+        Parent = parent;
+        ParentId = parent?.Id;
+    }
+
     public Guid Id { get; private set; }
 
     public string Name { get; private set; }

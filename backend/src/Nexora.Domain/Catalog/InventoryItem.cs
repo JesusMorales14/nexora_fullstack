@@ -43,6 +43,16 @@ public sealed class InventoryItem
 
     public int LowStockThreshold { get; private set; }
 
+    public void SetLowStockThreshold(int threshold)
+    {
+        if (threshold < 0)
+        {
+            throw new DomainException("Low stock threshold cannot be negative.");
+        }
+
+        LowStockThreshold = threshold;
+    }
+
     public int Available => OnHand - Reserved;
 
     public bool IsInStock => Available > 0;

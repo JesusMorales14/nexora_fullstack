@@ -49,6 +49,8 @@ public sealed partial class ProductVariant
 
     public InventoryItem Inventory { get; private set; }
 
+    public void Rename(string name) => Name = Guard.RequiredText(name, NameMaxLength, "Variant name");
+
     public void SetPrice(decimal price, decimal? compareAtPrice)
     {
         Price = Catalog.Price.EnsureValid(price, "Price");

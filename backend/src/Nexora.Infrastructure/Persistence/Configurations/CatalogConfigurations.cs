@@ -46,6 +46,10 @@ internal sealed class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.HasIndex(product => product.Slug).IsUnique();
         builder.HasIndex(product => new { product.CategoryId, product.IsPublished });
+
+        // Optimistic concurrency (PostgreSQL xmin): two admins editing the same product cannot
+        // silently overwrite each other; the second save gets a 409.
+        builder.Property<uint>(ConcurrencyVersion.PropertyName).IsRowVersion();
         builder.HasIndex(product => product.Name).HasMethod("gin").HasOperators("gin_trgm_ops");
 
         // Deleting a category or brand that still has products must fail, not cascade.

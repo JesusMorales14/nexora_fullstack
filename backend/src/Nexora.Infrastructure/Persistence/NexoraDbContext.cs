@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Nexora.Domain.Auditing;
 using Nexora.Domain.Catalog;
 using Nexora.Domain.Ordering;
 using Nexora.Infrastructure.Identity;
@@ -24,6 +25,10 @@ public sealed class NexoraDbContext(DbContextOptions<NexoraDbContext> options)
     public DbSet<InventoryItem> InventoryItems => Set<InventoryItem>();
 
     public DbSet<Order> Orders => Set<Order>();
+
+    public DbSet<InventoryMovement> InventoryMovements => Set<InventoryMovement>();
+
+    public DbSet<AuditLogEntry> AuditLog => Set<AuditLogEntry>();
 
     /// <summary>
     /// Data Protection keys (they encrypt the auth cookie and reset tokens). Persisted so sessions

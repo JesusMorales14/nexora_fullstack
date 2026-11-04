@@ -62,6 +62,8 @@ public sealed class Order
 
     public DateTimeOffset? PaidAt { get; private set; }
 
+    public DateTimeOffset? ShippedAt { get; private set; }
+
     public DateTimeOffset? ClosedAt { get; private set; }
 
     public IReadOnlyList<OrderItem> Items => _items;
@@ -144,6 +146,20 @@ public sealed class Order
     {
         EnsureStatus(OrderStatus.PendingPayment, "cancel");
         Status = OrderStatus.Cancelled;
+        ClosedAt = now;
+    }
+
+    public void MarkShipped(DateTimeOffset now)
+    {
+        EnsureStatus(OrderStatus.Paid, "ship");
+        Status = OrderStatus.Shipped;
+        ShippedAt = now;
+    }
+
+    public void MarkDelivered(DateTimeOffset now)
+    {
+        EnsureStatus(OrderStatus.Shipped, "deliver");
+        Status = OrderStatus.Delivered;
         ClosedAt = now;
     }
 

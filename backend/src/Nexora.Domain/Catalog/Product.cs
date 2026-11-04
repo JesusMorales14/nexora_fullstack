@@ -92,6 +92,49 @@ public sealed class Product
         return image;
     }
 
+    public void UpdateDetails(string name, string slug, string description, Category category, Brand brand, DateTimeOffset now)
+    {
+        ArgumentNullException.ThrowIfNull(category);
+        ArgumentNullException.ThrowIfNull(brand);
+
+        Name = Guard.RequiredText(name, NameMaxLength, "Product name");
+        Slug = Guard.Slug(slug);
+        Description = Guard.RequiredText(description, DescriptionMaxLength, "Product description");
+        Category = category;
+        CategoryId = category.Id;
+        Brand = brand;
+        BrandId = brand.Id;
+        UpdatedAt = now;
+    }
+
+    /// <summary>Hides the product from the storefront without deleting it (orders keep referencing it).</summary>
+    public void Unpublish(DateTimeOffset now)
+    {
+        IsPublished = false;
+        UpdatedAt = now;
+    }
+
+    public void RemoveImage(Guid imageId, DateTimeOffset now)
+    {
+        if (_images.RemoveAll(image => image.Id == imageId) == 0)
+        {
+            throw new DomainException("Image not found in this product.");
+        }
+
+        UpdatedAt = now;
+    }
+
+    public ProductVariant UpdateVariant(Guid variantId, string name, decimal price, decimal? compareAtPrice, DateTimeOffset now)
+    {
+        var variant = _variants.Find(candidate => candidate.Id == variantId)
+            ?? throw new DomainException("Variant not found in this product.");
+
+        variant.Rename(name);
+        variant.SetPrice(price, compareAtPrice);
+        UpdatedAt = now;
+        return variant;
+    }
+
     /// <summary>A product without purchasable variants cannot be shown in the store.</summary>
     public void Publish(DateTimeOffset now)
     {

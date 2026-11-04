@@ -38,7 +38,7 @@ internal sealed class OrderConfiguration : IEntityTypeConfiguration<Order>
 
         // Optimistic concurrency on PostgreSQL's xmin system column: the payment confirmation and
         // the expiration sweep can never both change the same order.
-        builder.Property<uint>("Version").IsRowVersion();
+        builder.Property<uint>(ConcurrencyVersion.PropertyName).IsRowVersion();
 
         builder.ComplexProperty(order => order.ShippingAddress, address =>
         {

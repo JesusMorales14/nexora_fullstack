@@ -2,8 +2,10 @@ using System.Text.Json.Serialization;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Nexora.Api.Auth;
+using Nexora.Api.Common;
 using Nexora.Api.Configuration;
 using Nexora.Application.Checkout;
+using Nexora.Application.Common;
 using Nexora.Infrastructure;
 using Nexora.Infrastructure.Persistence;
 using Scalar.AspNetCore;
@@ -33,6 +35,10 @@ builder.Services.AddOptions<FrontendOptions>()
     .BindConfiguration(FrontendOptions.SectionName)
     .ValidateDataAnnotations()
     .ValidateOnStart();
+
+builder.Services.AddExceptionHandler<DomainExceptionHandler>();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
 
 builder.Services.AddInfrastructure();
 builder.Services.AddNexoraAuth(builder.Configuration, builder.Environment);

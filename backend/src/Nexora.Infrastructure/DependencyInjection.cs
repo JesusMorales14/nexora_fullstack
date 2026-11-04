@@ -55,6 +55,10 @@ public static class DependencyInjection
         services.AddScoped<IAccountEmailSender, SmtpAccountEmailSender>();
         services.AddScoped<ICheckoutService, CheckoutService>();
         services.AddScoped<IOrderQueries, OrderQueries>();
+        services.AddScoped<AuditTrail>();
+        services.AddScoped<IAuditLogQueries, AuditLogQueries>();
+        services.AddScoped<IAdminCatalogService, AdminCatalogService>();
+        services.AddScoped<IAdminInventoryService, AdminInventoryService>();
         services.AddSingleton<IPaymentGateway, SimulatedPaymentGateway>();
         services.AddHostedService<PendingOrderExpirationService>();
 

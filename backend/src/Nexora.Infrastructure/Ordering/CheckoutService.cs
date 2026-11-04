@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Nexora.Application.Catalog;
 using Nexora.Application.Checkout;
 using Nexora.Application.Common;
+using Nexora.Domain.Catalog;
 using Nexora.Domain.Ordering;
 using Nexora.Infrastructure.Persistence;
 using Npgsql;
@@ -207,6 +208,10 @@ internal sealed class CheckoutService(
                 {
                     throw new InvalidOperationException($"Reservation for {item.Sku} in order {order.OrderNumber} is missing.");
                 }
+
+                // Every on-hand change is explained in the inventory ledger.
+                db.InventoryMovements.Add(new InventoryMovement(
+                    item.VariantId, -item.Quantity, InventoryMovementReason.Sale, note: null, actorUserId: null, order.OrderNumber, now));
             }
 
             order.MarkPaid(paymentReference, now);
