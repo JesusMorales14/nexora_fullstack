@@ -2,6 +2,7 @@ import { ArrowRight } from 'lucide-react'
 import { Link } from 'react-router'
 
 import { ErrorState } from '@/components/shared/ErrorState'
+import { PageMeta } from '@/components/shared/PageMeta'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useGetCategoriesQuery, useGetProductsQuery } from '@/features/products/api/productsApi'
@@ -19,10 +20,10 @@ export function HomePage() {
 
   return (
     <>
-      <title>Nexora | Tienda de tecnología en Perú</title>
-      <meta
-        name="description"
-        content="Laptops, monitores, periféricos, audio y smartphones con precios en soles y envío a todo el Perú."
+      <PageMeta
+        title="Nexora | Tienda de tecnología en Perú"
+        description="Laptops, monitores, periféricos, audio y smartphones con precios en soles y envío a todo el Perú."
+        canonicalPath="/"
       />
 
       <section className="border-b bg-gradient-to-b from-accent/60 to-background">

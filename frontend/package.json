@@ -19,7 +19,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "audit:prod": "pnpm audit --prod --audit-level moderate"
+    "audit:prod": "pnpm audit --prod --audit-level moderate",
+    "generate:pwa-assets": "pwa-assets-generator"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.3.0",
@@ -49,6 +50,7 @@
     "@types/node": "^22.20.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "@vite-pwa/assets-generator": "2.0.0",
     "@vitejs/plugin-react": "^6.1.2",
     "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.1.8",
@@ -64,6 +66,8 @@
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.72.1",
     "vite": "^8.3.5",
-    "vitest": "^5.1.0"
+    "vite-plugin-pwa": "2.0.0",
+    "vitest": "^5.1.0",
+    "workbox-window": "7.4.1"
   }
 }

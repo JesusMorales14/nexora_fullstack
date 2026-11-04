@@ -2,6 +2,7 @@ import { SlidersHorizontal } from 'lucide-react'
 import { useState } from 'react'
 
 import { EmptyState } from '@/components/shared/EmptyState'
+import { PageMeta } from '@/components/shared/PageMeta'
 import { ErrorState } from '@/components/shared/ErrorState'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
@@ -10,11 +11,31 @@ import { CatalogFilters } from '@/features/products/components/CatalogFilters'
 import { Pagination } from '@/components/shared/Pagination'
 import { ProductGrid, ProductGridSkeleton } from '@/features/products/components/ProductGrid'
 import { CATALOG_PAGE_SIZE, useProductFilters } from '@/features/products/hooks/useProductFilters'
-import { PRODUCT_SORT_OPTIONS } from '@/features/products/types'
+import { PRODUCT_SORT_OPTIONS, type ProductListParams } from '@/features/products/types'
 import { getErrorMessage } from '@/lib/api/apiErrors'
 import { cn } from '@/lib/utils/cn'
 
 const FILTERS_PANEL_ID = 'catalog-filters'
+
+function catalogCanonicalPath(category: string | undefined): string {
+  return category ? `/products?category=${encodeURIComponent(category)}` : '/products'
+}
+
+/**
+ * Only the full catalog and single-category listings (the URLs in the sitemap) are indexed.
+ * Searches, filter combinations, sorting and later pages would be near-duplicates.
+ */
+function isIndexableCatalogView(filters: ProductListParams): boolean {
+  return (
+    (filters.page ?? 1) === 1 &&
+    filters.q === undefined &&
+    filters.brand === undefined &&
+    filters.minPrice === undefined &&
+    filters.maxPrice === undefined &&
+    filters.inStock !== true &&
+    (filters.sort === undefined || filters.sort === 'relevance')
+  )
+}
 
 export function CatalogPage() {
   const { filters, setFilters, setPage, clearFilters, hasActiveFilters } = useProductFilters()
@@ -30,10 +51,11 @@ export function CatalogPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <title>{`${heading} | Nexora`}</title>
-      <meta
-        name="description"
-        content="Explora laptops, monitores, periféricos, audio y smartphones con precios en soles."
+      <PageMeta
+        title={`${heading} | Nexora`}
+        description="Explora laptops, monitores, periféricos, audio y smartphones con precios en soles."
+        canonicalPath={catalogCanonicalPath(filters.category)}
+        noindex={!isIndexableCatalogView(filters)}
       />
 
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">

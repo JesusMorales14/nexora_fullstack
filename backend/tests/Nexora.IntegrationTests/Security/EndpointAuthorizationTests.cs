@@ -16,6 +16,9 @@ public sealed class EndpointAuthorizationTests(NexoraApiFactory factory)
     {
         // Health checks are mapped for any method; they expose only "Healthy"/"Unhealthy".
         "ANY health",
+        // Crawler-facing SEO: only published catalog data (Phase 10, ADR-0001).
+        "GET sitemap.xml",
+        "GET seo/products/{slug}",
         "GET api/v1/products",
         "GET api/v1/products/{slug}",
         "GET api/v1/categories",

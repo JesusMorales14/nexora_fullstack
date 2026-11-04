@@ -4,9 +4,11 @@ import { Link, useParams } from 'react-router'
 import { ErrorState } from '@/components/shared/ErrorState'
 import { NotFoundPage } from '@/components/shared/NotFoundPage'
 import { PageLoader } from '@/components/shared/PageLoader'
+import { PageMeta } from '@/components/shared/PageMeta'
 import { useGetProductBySlugQuery } from '@/features/products/api/productsApi'
 import { PriceTag } from '@/features/products/components/PriceTag'
 import { ProductGallery } from '@/features/products/components/ProductGallery'
+import { ProductJsonLd } from '@/features/products/components/ProductJsonLd'
 import { StockBadge } from '@/features/products/components/StockBadge'
 import { AddToCartForm } from '@/features/cart/components/AddToCartForm'
 import { VariantSelector } from '@/features/products/components/VariantSelector'
@@ -52,11 +54,14 @@ function ProductDetailsView({ product }: ProductDetailsViewProps) {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-      <title>{`${product.name} | Nexora`}</title>
-      <meta
-        name="description"
-        content={product.description.slice(0, META_DESCRIPTION_MAX_LENGTH)}
+      <PageMeta
+        title={`${product.name} | Nexora`}
+        description={product.description.slice(0, META_DESCRIPTION_MAX_LENGTH)}
+        canonicalPath={`/products/${encodeURIComponent(product.slug)}`}
+        type="product"
+        imageUrl={product.images[0]?.url}
       />
+      <ProductJsonLd product={product} />
 
       <nav aria-label="Ruta de navegación" className="mb-6 text-sm text-muted-foreground">
         <ol className="flex flex-wrap items-center gap-1">

@@ -23,7 +23,7 @@ Opción 1. El frontend es una SPA con `createBrowserRouter`; el admin se carga c
 ## Consecuencias
 
 - Google renderiza JavaScript, pero los rastreadores sociales (WhatsApp, Facebook, X) no.
-- Mitigación prevista para la Fase 10:
+- Mitigación (implementada en la Fase 10, ver [ADR-0009](0009-pwa-and-seo.md)):
   - `sitemap.xml` y `robots.txt` generados por la API desde la base de datos.
   - Para `/products/:slug`, el servidor devuelve `index.html` con `<title>`, descripción,
     Open Graph, canonical y JSON-LD `Product` ya insertados.

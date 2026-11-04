@@ -3,10 +3,11 @@
 E-commerce de tecnología para el mercado peruano (precios en soles, IGV incluido).
 Proyecto de portafolio: storefront + panel administrativo sobre una API REST propia.
 
-> Estado: **Fases 1–9.** Tienda completa (catálogo, cuentas, carrito, checkout con pago simulado,
-> pedidos), panel administrativo, notificaciones en tiempo real, y revisión de calidad y seguridad
-> (cabeceras y CSP, permisos verificados por pruebas, E2E con Playwright y axe, Lighthouse).
-> Pendiente: PWA/SEO (fase 10) y despliegue (fase 11).
+> Estado: **Fases 1–10.** Tienda completa (catálogo, cuentas, carrito, checkout con pago simulado,
+> pedidos), panel administrativo, notificaciones en tiempo real, revisión de calidad y seguridad
+> (cabeceras y CSP, permisos verificados por pruebas, E2E con Playwright y axe, Lighthouse),
+> PWA instalable con modo offline y SEO (sitemap, metadatos de producto desde el servidor, JSON-LD).
+> Pendiente: despliegue (fase 11).
 
 ## Stack
 
@@ -132,6 +133,13 @@ Reportes: [seguridad](docs/quality/security.md) ·
 | POST   | `/api/v1/orders/{number}/simulated-payment` | Aprueba/rechaza el pago (solo con la pasarela simulada) |
 | *      | `/api/v1/admin/...`      | Panel (rol Admin): `products`, `categories`, `brands`, `inventory`, `orders`, `customers`, `reports/orders.csv`, `administrators`, `audit-log`. Detalle en OpenAPI (`/scalar`) |
 
+Fuera de `/api/v1`, para rastreadores (ver [ADR-0009](docs/adr/0009-pwa-and-seo.md)):
+
+| Método | Ruta                     | Descripción                                                                 |
+| ------ | ------------------------ | --------------------------------------------------------------------------- |
+| GET    | `/sitemap.xml`           | Inicio, catálogo, categorías y productos publicados                         |
+| GET    | `/seo/products/{slug}`   | `index.html` con título, Open Graph, canonical y JSON-LD del producto (404 + `noindex` si no existe) |
+
 Los errores se devuelven como Problem Details (RFC 9457) con `traceId`. Todo `POST/PUT/PATCH/DELETE`
 requiere la cabecera `X-XSRF-TOKEN`; los endpoints de auth tienen rate limiting por IP.
 
@@ -144,11 +152,13 @@ requiere la cabecera `X-XSRF-TOKEN`; los endpoints de auth tienen rate limiting 
 | `Seed:Admin:*`           | user-secrets       | Administrador inicial (solo Development)       |
 | `Frontend:BaseUrl`       | appsettings / entorno | URL pública de la tienda (enlaces de correo) |
 | `Frontend:AllowedCorsOrigins` | entorno       | Orígenes con CORS + credenciales (producción)  |
+| `Frontend:IndexHtmlUrl`  | appsettings / entorno | `index.html` del build usado en las páginas SEO (por defecto `{BaseUrl}/index.html`) |
 | `Email:Smtp:*`           | appsettings / secretos | Servidor SMTP (`Password` siempre como secreto) |
 | `Shipping:*`             | appsettings        | Tarifas de envío y umbral de envío gratis      |
 | `Tax:IgvRate`            | appsettings        | Tasa de IGV (0.18)                             |
 | `Payments:*`             | appsettings        | Pasarela (`Fake`), ventana de pago, barrido de expiración |
 | `VITE_API_BASE_URL`      | `frontend/.env.local` | URL pública de la API (por defecto `/api/v1`) |
+| `VITE_SITE_URL`          | entorno del build  | Origen público de la tienda: añade `Sitemap:` a `robots.txt` |
 
 Todo `VITE_*` termina en el navegador: nunca contiene secretos.
 
@@ -162,3 +172,4 @@ Todo `VITE_*` termina en el navegador: nunca contiene secretos.
 - [ADR-0006 — Carrito, checkout, stock y pagos](docs/adr/0006-cart-checkout-and-payments.md)
 - [ADR-0007 — Panel administrativo](docs/adr/0007-admin-panel.md)
 - [ADR-0008 — Notificaciones en tiempo real (SignalR)](docs/adr/0008-realtime-notifications.md)
+- [ADR-0009 — PWA y SEO](docs/adr/0009-pwa-and-seo.md)

@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { http, HttpResponse } from 'msw'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { customerFixture, problem, signedInAs } from '@/test/msw/authFixtures'
 import { ORDER_NUMBER, orderFixture, quoteFixture, VARIANT_ID } from '@/test/msw/orderFixtures'
@@ -43,6 +43,20 @@ describe('CheckoutPage', () => {
       await screen.findByText('Ingresa un celular de 9 dígitos que empiece con 9.'),
     ).toBeInTheDocument()
     expect(screen.getByText('Selecciona un departamento.')).toBeInTheDocument()
+  })
+
+  it('does not let the shopper place an order while offline', async () => {
+    vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false)
+    server.use(
+      signedInAs(customerFixture),
+      http.post(apiUrl('cart/quote'), () => HttpResponse.json(quoteFixture())),
+    )
+    renderRoute('/checkout', { cart: CART })
+
+    expect(await screen.findByRole('button', { name: 'Ir a pagar' })).toBeDisabled()
+    expect(
+      screen.getByText('Sin conexión: conéctate a internet para crear tu pedido.'),
+    ).toBeInTheDocument()
   })
 
   it('places the order with an idempotency key and goes to payment', async () => {

@@ -51,6 +51,7 @@ public static class DependencyInjection
             .ValidateOnStart();
 
         services.AddScoped<IProductCatalog, ProductCatalog>();
+        services.AddScoped<ISitemapSource, SitemapSource>();
         services.AddScoped<IAdminDashboard, AdminDashboard>();
         services.AddScoped<IAccountEmailSender, SmtpAccountEmailSender>();
         services.AddScoped<ICheckoutService, CheckoutService>();

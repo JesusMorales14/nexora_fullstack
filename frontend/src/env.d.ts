@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+/// <reference types="vite-plugin-pwa/react" />
 
 // Only VITE_* variables reach the browser bundle: never put secrets here.
 interface ImportMetaEnv {

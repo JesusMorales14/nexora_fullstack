@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Nexora.Api.Seo;
 using Nexora.Application.Auth;
 using Nexora.Infrastructure;
 using Nexora.Infrastructure.Persistence;
@@ -109,6 +110,8 @@ public sealed class NexoraApiFactory : WebApplicationFactory<Program>, IAsyncLif
         {
             services.RemoveAll<IAccountEmailSender>();
             services.AddSingleton<IAccountEmailSender>(Emails);
+            services.RemoveAll<IIndexHtmlTemplate>();
+            services.AddSingleton<IIndexHtmlTemplate, FakeIndexHtmlTemplate>();
         });
     }
 }

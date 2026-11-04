@@ -5,6 +5,7 @@ using Nexora.Api.Auth;
 using Nexora.Api.Common;
 using Nexora.Api.Configuration;
 using Nexora.Api.Realtime;
+using Nexora.Api.Seo;
 using Nexora.Application.Checkout;
 using Nexora.Application.Common;
 using Nexora.Application.Realtime;
@@ -53,6 +54,9 @@ builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
 
 builder.Services.AddInfrastructure();
 builder.Services.AddNexoraAuth(builder.Configuration, builder.Environment);
+
+builder.Services.AddMemoryCache();
+builder.Services.AddHttpClient<IIndexHtmlTemplate, HttpIndexHtmlTemplate>(client => client.Timeout = TimeSpan.FromSeconds(5));
 
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<IRealtimeNotifier, SignalRNotifier>();

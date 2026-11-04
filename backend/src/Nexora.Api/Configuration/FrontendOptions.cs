@@ -17,4 +17,10 @@ public sealed class FrontendOptions
     /// where the Vite proxy keeps everything same-origin.
     /// </summary>
     public string[] AllowedCorsOrigins { get; init; } = [];
+
+    /// <summary>
+    /// Where to read the built index.html used for server-rendered product metadata. Defaults to
+    /// {BaseUrl}/index.html; set it when the HTML is served from another address (e.g. local preview).
+    /// </summary>
+    public string? IndexHtmlUrl { get; init; }
 }

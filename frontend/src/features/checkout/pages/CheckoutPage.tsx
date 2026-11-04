@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/shared/EmptyState'
 import { FormAlert } from '@/components/shared/FormAlert'
 import { FormField } from '@/components/shared/FormField'
 import { Button } from '@/components/ui/button'
+import { useOnlineStatus } from '@/features/pwa/useOnlineStatus'
 import { Label } from '@/components/ui/label'
 import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser'
 import { useQuoteCartQuery } from '@/features/cart/api/cartApi'
@@ -38,6 +39,8 @@ export function CheckoutPage() {
   const { user } = useCurrentUser()
   const items = useAppSelector(selectCartItems)
   const [placeOrder, { isLoading: isPlacing }] = usePlaceOrderMutation()
+  // Orders are never queued offline: the shopper must see the real result of placing one.
+  const isOnline = useOnlineStatus()
   const [formError, setFormError] = useState<string | null>(null)
   // Reused while the outcome of a submit is unknown (network error, timeout), so retrying can
   // never create a second order. Replaced only after the server gave a definitive answer.
@@ -230,11 +233,16 @@ export function CheckoutPage() {
                 form="checkout-form"
                 size="lg"
                 className="h-11"
-                disabled={isPlacing || isQuoting || !quote.canCheckout}
+                disabled={!isOnline || isPlacing || isQuoting || !quote.canCheckout}
               >
                 <Lock aria-hidden="true" />
                 {isPlacing ? 'Creando pedido…' : 'Ir a pagar'}
               </Button>
+              {!isOnline && (
+                <p className="text-sm text-destructive">
+                  Sin conexión: conéctate a internet para crear tu pedido.
+                </p>
+              )}
               {!quote.canCheckout && (
                 <p className="text-sm text-destructive">
                   Hay productos sin stock suficiente.{' '}

@@ -9,6 +9,10 @@ internal sealed class SecurityHeadersMiddleware(RequestDelegate next, IHostEnvir
 {
     private const string ApiContentSecurityPolicy = "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'";
 
+    // Storefront pages rendered for crawlers (/seo/...) run the SPA: its build ships the full policy as a
+    // <meta> tag; the header adds what a meta tag cannot express (frame-ancestors).
+    private const string StorefrontPageContentSecurityPolicy = "frame-ancestors 'none'; object-src 'none'; base-uri 'self'";
+
     // Endpoints with personal or session data must never be stored by browsers or shared caches
     // (nor, later, by the PWA service worker).
     private static readonly string[] PrivatePathPrefixes =
@@ -27,7 +31,11 @@ internal sealed class SecurityHeadersMiddleware(RequestDelegate next, IHostEnvir
             headers["Cross-Origin-Resource-Policy"] = "same-site";
 
             // The interactive API docs (Development only) need their own scripts and styles.
-            if (!IsDevelopmentDocs(context.Request.Path))
+            if (context.Request.Path.StartsWithSegments("/seo", StringComparison.OrdinalIgnoreCase))
+            {
+                headers.ContentSecurityPolicy = StorefrontPageContentSecurityPolicy;
+            }
+            else if (!IsDevelopmentDocs(context.Request.Path))
             {
                 headers.ContentSecurityPolicy = ApiContentSecurityPolicy;
             }

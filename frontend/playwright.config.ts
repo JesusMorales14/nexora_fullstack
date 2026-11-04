@@ -35,6 +35,8 @@ export default defineConfig({
     {
       command: 'dotnet run --project ../backend/src/Nexora.Api --launch-profile http',
       url: API_HEALTH_URL,
+      // Product pages are rendered by the API from the built index.html served by `vite preview`.
+      env: { Frontend__IndexHtmlUrl: `${PREVIEW_URL}/index.html` },
       reuseExistingServer: !isCi,
       timeout: SERVER_START_TIMEOUT_MS,
     },

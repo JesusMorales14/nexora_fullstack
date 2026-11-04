@@ -14,9 +14,11 @@ describe('add to cart from the product page', () => {
     await user.click(screen.getByRole('button', { name: 'Añadir al carrito' }))
 
     expect(store.getState().cart.items).toEqual([{ variantId: 'v2', quantity: 2 }])
-    expect(screen.getByRole('status')).toHaveTextContent(
-      'Añadiste 2 × Samsung Galaxy S25 al carrito.',
-    )
+    // Announced through the form's own live region (the shell has another one for connectivity).
+    const confirmation = screen.getByText('Añadiste 2 × Samsung Galaxy S25 al carrito.', {
+      exact: false,
+    })
+    expect(confirmation.closest('[role="status"]')).not.toBeNull()
     expect(
       screen.getByRole('link', { name: 'Carrito de compras, 2 productos' }),
     ).toBeInTheDocument()

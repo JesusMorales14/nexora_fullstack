@@ -22,7 +22,24 @@ Móvil = emulación de Moto G con CPU 4× más lenta y red 4G lenta. Escritorio 
 
 \* El orden de encabezados del catálogo se corrigió después de medir (h2 oculto entre h1 y tarjetas).
 
-### Optimizaciones aplicadas en esta fase
+### Después de la fase 10 (PWA + SEO)
+
+Misma máquina y configuración (Lighthouse 13.6.0). El rendimiento en móvil varía mucho entre
+ejecuciones por la carga del equipo; lo comparable de forma fiable es SEO y accesibilidad.
+
+| Página | Formato | Rendimiento | Accesibilidad | Buenas prácticas | SEO | LCP | CLS | TBT |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Inicio | móvil | 99 | 100 | 96 | 100 | 0.8 s | 0.000 | 110 ms |
+| Catálogo | móvil | 93 | 100 | 96 | 100 | 2.8 s | 0.016 | 200 ms |
+| Producto | móvil | 92 | 100 | 96 | 100 | 2.7 s | 0.059 | 240 ms |
+| Inicio | escritorio | 100 | 100 | 96 | 100 | 0.2 s | 0.000 | 0 ms |
+| Catálogo | escritorio | 98 | 100 | 96 | 100 | 0.6 s | 0.010 | 0 ms |
+| Producto | escritorio | 100 | 100 | 96 | 100 | 0.6 s | 0.000 | 0 ms |
+
+SEO 92 → 100 con `robots.txt`, canonical y metadatos por página. El LCP del catálogo y del producto
+en móvil sigue por encima de 2.5 s: la imagen principal llega después del JS y de la API.
+
+### Optimizaciones aplicadas en la fase 9
 
 | Cambio | Efecto |
 | --- | --- |
@@ -40,7 +57,7 @@ Móvil = emulación de Moto G con CPU 4× más lenta y red 4G lenta. Escritorio 
   el runtime de RTK Query de las rutas que no consultan la API.
 - **Buenas prácticas 96:** el 401 de `/auth/me` para visitantes anónimos aparece en consola. Es la
   respuesta correcta de la API; se acepta.
-- **SEO 92:** falta `robots.txt` (fase 10).
+- ~~**SEO 92:** falta `robots.txt`~~ → resuelto en la fase 10 (SEO 100).
 
 ## Accesibilidad automatizada (axe, WCAG 2.2 A/AA)
 
