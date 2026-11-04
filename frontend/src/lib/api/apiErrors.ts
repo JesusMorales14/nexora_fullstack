@@ -29,6 +29,15 @@ function isFetchBaseQueryError(error: ApiError): error is FetchBaseQueryError {
   return typeof error === 'object' && 'status' in error
 }
 
+/** The server's own explanation (Problem Details `detail`), when it sent one. */
+export function getProblemDetail(error: ApiError): string | undefined {
+  if (!isFetchBaseQueryError(error) || typeof error.data !== 'object' || error.data === null) {
+    return undefined
+  }
+  const detail = (error.data as ProblemDetails).detail
+  return typeof detail === 'string' && detail.length > 0 ? detail : undefined
+}
+
 export function getHttpStatus(error: ApiError): number | undefined {
   return isFetchBaseQueryError(error) && typeof error.status === 'number' ? error.status : undefined
 }

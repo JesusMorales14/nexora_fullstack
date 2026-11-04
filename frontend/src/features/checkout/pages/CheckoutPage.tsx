@@ -17,7 +17,7 @@ import { CartSummary } from '@/features/cart/components/CartSummary'
 import { PERU_DEPARTMENTS } from '@/features/checkout/peruDepartments'
 import { type ShippingAddressFormValues, shippingAddressSchema } from '@/features/checkout/schemas'
 import { usePlaceOrderMutation } from '@/features/orders/api/ordersApi'
-import { type ApiError, getHttpStatus, type ProblemDetails } from '@/lib/api/apiErrors'
+import { type ApiError, getHttpStatus, getProblemDetail } from '@/lib/api/apiErrors'
 import { applyServerErrors } from '@/lib/api/formErrors'
 import { formatPrice } from '@/lib/utils/formatPrice'
 
@@ -32,13 +32,6 @@ const SERVER_FIELD_MAP = {
   'shippingAddress.addressLine': 'addressLine',
   'shippingAddress.reference': 'reference',
 } as const
-
-function getConflictDetail(error: ApiError): string | undefined {
-  if (error && 'data' in error && typeof error.data === 'object' && error.data !== null) {
-    return (error.data as ProblemDetails).detail
-  }
-  return undefined
-}
 
 export function CheckoutPage() {
   const navigate = useNavigate()
@@ -98,7 +91,7 @@ export function CheckoutPage() {
       if (getHttpStatus(apiError) !== undefined) pendingIdempotencyKey.current = null
 
       if (getHttpStatus(apiError) === HTTP_CONFLICT) {
-        setFormError(getConflictDetail(apiError) ?? 'Revisa tu carrito antes de continuar.')
+        setFormError(getProblemDetail(apiError) ?? 'Revisa tu carrito antes de continuar.')
         void refetchQuote()
         return
       }

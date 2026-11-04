@@ -114,6 +114,18 @@ const baseQueryWithCsrf: BaseQueryFn<string | FetchArgs, unknown, FetchBaseQuery
 export const baseApi = createApi({
   reducerPath: 'api',
   baseQuery: baseQueryWithCsrf,
-  tagTypes: ['Product', 'Category', 'Brand', 'CurrentUser', 'AdminSummary', 'Order'],
+  tagTypes: [
+    'Product',
+    'Category',
+    'Brand',
+    'CurrentUser',
+    'AdminSummary',
+    'Order',
+    'AdminProduct',
+    'AdminCategory',
+    'AdminBrand',
+    'AdminInventory',
+    'AuditLog',
+  ],
   endpoints: () => ({}),
 })

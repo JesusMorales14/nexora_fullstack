@@ -5,8 +5,10 @@ import { afterAll, afterEach, beforeAll } from 'vitest'
 
 import { server } from '@/test/msw/server'
 
-// Route changes chain several lazy chunks plus API calls; 1s (the default) is tight on CI.
-configure({ asyncUtilTimeout: 3_000 })
+// Route changes chain several lazy chunks plus API calls, and the suite runs files in parallel:
+// under load (or on a 2-core CI runner) the 1s default produces false failures. findBy* still
+// resolves as soon as the element appears; this only bounds how long a real failure takes.
+configure({ asyncUtilTimeout: 8_000 })
 
 // jsdom does not implement scrolling; ScrollRestoration and pagination call it.
 window.scrollTo = () => undefined

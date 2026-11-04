@@ -36,7 +36,7 @@ export default defineConfig([
   {
     // RTK Query documents `build.query<Result, void>` for endpoints without arguments,
     // which lets callers write `useGetBrandsQuery()` instead of `useGetBrandsQuery(undefined)`.
-    files: ['src/features/*/api/*.ts'],
+    files: ['src/features/**/*Api.ts'],
     rules: { '@typescript-eslint/no-invalid-void-type': 'off' },
   },
   {

@@ -2,13 +2,13 @@ import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 
-interface CatalogPaginationProps {
+interface PaginationProps {
   page: number
   totalPages: number
   onPageChange: (page: number) => void
 }
 
-export function CatalogPagination({ page, totalPages, onPageChange }: CatalogPaginationProps) {
+export function Pagination({ page, totalPages, onPageChange }: PaginationProps) {
   if (totalPages <= 1) return null
 
   return (

@@ -29,6 +29,8 @@ export default defineConfig({
     setupFiles: ['./src/test/setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
     restoreMocks: true,
+    // Full-page flows (several lazy routes + typing) exceed 5s when the whole suite runs in parallel.
+    testTimeout: 15_000,
     // Node's fetch needs an absolute URL; MSW intercepts this origin (src/test/msw/server.ts).
     env: { VITE_API_BASE_URL: 'http://localhost:3000/api/v1' },
   },

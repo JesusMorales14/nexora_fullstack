@@ -15,7 +15,7 @@ import {
   type ApiError,
   getErrorMessage,
   getHttpStatus,
-  type ProblemDetails,
+  getProblemDetail,
 } from '@/lib/api/apiErrors'
 import { formatPrice } from '@/lib/utils/formatPrice'
 
@@ -47,11 +47,7 @@ export function SimulatedPaymentPage() {
       }
     } catch (caught: unknown) {
       const apiError = caught as ApiError
-      const detail =
-        apiError && 'data' in apiError
-          ? (apiError.data as ProblemDetails | undefined)?.detail
-          : undefined
-      setPaymentError(detail ?? getErrorMessage(apiError))
+      setPaymentError(getProblemDetail(apiError) ?? getErrorMessage(apiError))
     }
   }
 

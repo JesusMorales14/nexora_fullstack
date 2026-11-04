@@ -150,6 +150,49 @@ export const routes: RouteObject[] = [
               (m) => m.AdminDashboardPage,
             ),
           },
+          {
+            path: 'products',
+            lazy: lazyPage(
+              () => import('@/features/products/admin/pages/AdminProductsPage'),
+              (m) => m.AdminProductsPage,
+            ),
+          },
+          {
+            path: 'products/new',
+            lazy: lazyPage(
+              () => import('@/features/products/admin/pages/AdminProductEditorPage'),
+              (m) => m.AdminProductEditorPage,
+            ),
+          },
+          {
+            path: 'products/:productId',
+            lazy: lazyPage(
+              () => import('@/features/products/admin/pages/AdminProductEditorPage'),
+              (m) => m.AdminProductEditorPage,
+            ),
+          },
+          {
+            path: 'categories',
+            lazy: lazyPage(
+              () => import('@/features/categories/pages/AdminCategoriesPage'),
+              (m) => m.AdminCategoriesPage,
+            ),
+          },
+          {
+            path: 'inventory',
+            lazy: lazyPage(
+              () => import('@/features/inventory/pages/AdminInventoryPage'),
+              (m) => m.AdminInventoryPage,
+            ),
+          },
+          {
+            path: 'audit-log',
+            lazy: lazyPage(
+              () => import('@/features/audit/pages/AuditLogPage'),
+              (m) => m.AuditLogPage,
+            ),
+          },
+          { path: '*', Component: NotFoundPage },
         ],
       },
     ],

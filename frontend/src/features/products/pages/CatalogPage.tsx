@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { useGetProductsQuery } from '@/features/products/api/productsApi'
 import { CatalogFilters } from '@/features/products/components/CatalogFilters'
-import { CatalogPagination } from '@/features/products/components/CatalogPagination'
+import { Pagination } from '@/components/shared/Pagination'
 import { ProductGrid, ProductGridSkeleton } from '@/features/products/components/ProductGrid'
 import { CATALOG_PAGE_SIZE, useProductFilters } from '@/features/products/hooks/useProductFilters'
 import { PRODUCT_SORT_OPTIONS } from '@/features/products/types'
@@ -101,7 +101,7 @@ export function CatalogPage() {
               <div className={cn('transition-opacity', isFetching && 'opacity-60')}>
                 <ProductGrid products={data.items} />
               </div>
-              <CatalogPagination
+              <Pagination
                 page={data.page}
                 totalPages={data.totalPages}
                 onPageChange={handlePageChange}
