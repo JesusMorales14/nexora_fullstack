@@ -7,7 +7,8 @@ Proyecto de portafolio: storefront + panel administrativo sobre una API REST pro
 > pedidos), panel administrativo, notificaciones en tiempo real, revisión de calidad y seguridad
 > (cabeceras y CSP, permisos verificados por pruebas, E2E con Playwright y axe, Lighthouse),
 > PWA instalable con modo offline y SEO (sitemap, metadatos de producto desde el servidor, JSON-LD).
-> Pendiente: despliegue (fase 11).
+> Fase 11: se ejecuta en localhost con un comando (`scripts/dev.ps1`); el despliegue a un servidor
+> queda pendiente ([qué falta](docs/deployment.md)).
 
 ## Stack
 
@@ -16,6 +17,52 @@ Proyecto de portafolio: storefront + panel administrativo sobre una API REST pro
 | Frontend | React 19, TypeScript 6 (strict), Vite 8, React Router 8 (data mode), Redux Toolkit + RTK Query, Tailwind CSS 4, shadcn/ui |
 | Backend  | ASP.NET Core (.NET 10 LTS, controllers), EF Core 10, PostgreSQL 18                  |
 | Calidad  | ESLint 10, Prettier, Vitest + Testing Library + MSW, xUnit v3 + Testcontainers, GitHub Actions |
+
+## Arquitectura
+
+```mermaid
+flowchart LR
+  subgraph Navegador
+    SPA["SPA React<br/>tienda + panel admin"]
+    SW["Service worker<br/>(shell offline, catálogo público)"]
+  end
+  Crawler["Buscadores y<br/>vistas previas sociales"]
+
+  subgraph Host["Host de la tienda (Vite en local)"]
+    Static["Build estático<br/>index.html, assets, robots.txt"]
+  end
+
+  subgraph API["API ASP.NET Core"]
+    REST["REST /api/v1<br/>controllers + validación"]
+    Hub["SignalR /hubs/notifications"]
+    Seo["/sitemap.xml<br/>/seo/products/{slug}"]
+    App["Application<br/>casos de uso"]
+    Dom["Domain<br/>entidades e invariantes"]
+    Infra["Infrastructure<br/>EF Core, Identity, SMTP,<br/>pasarela de pago simulada"]
+  end
+
+  DB[("PostgreSQL 18")]
+  Mail["SMTP<br/>(MailPit en local)"]
+
+  SPA -- "fetch + cookie HttpOnly + X-XSRF-TOKEN" --> REST
+  SPA <-- "WebSocket" --> Hub
+  SW -.-> SPA
+  SPA --> Static
+  Crawler -- "HTML de /products/:slug, sitemap" --> Seo
+  REST --> App --> Dom
+  App --> Infra
+  Seo --> App
+  Hub --> App
+  Infra --> DB
+  Infra --> Mail
+```
+
+- **Mismo origen:** el host reenvía `/api`, `/hubs` y `/sitemap.xml` a la API. Las cookies son
+  first-party y no hace falta CORS ([ADR-0001](docs/adr/0001-spa-rendering-and-seo.md)).
+- **Capas:** Api → Application → Domain. Infrastructure implementa las interfaces de Application
+  (EF Core, Identity, correo, pagos) y solo la referencia Api para componer.
+- **Tiempo real:** los eventos (pedido pagado, cambio de estado, stock bajo) se envían después del
+  commit. Si el WebSocket cae, el cliente consulta cada 30 s ([ADR-0008](docs/adr/0008-realtime-notifications.md)).
 
 ## Estructura
 
@@ -33,7 +80,10 @@ nexora/
     src/Nexora.Infrastructure  EF Core, PostgreSQL, migraciones, seed
     tests/                     UnitTests e IntegrationTests (PostgreSQL real)
   docs/adr/              decisiones de arquitectura
-  docker-compose.yml     PostgreSQL local
+  docs/quality/          reportes de seguridad, rendimiento y accesibilidad
+  docs/deployment.md     qué falta para publicar en un servidor
+  scripts/dev.ps1        arranca todo en localhost con un comando
+  docker-compose.yml     PostgreSQL y MailPit locales
 ```
 
 ## Requisitos
@@ -42,9 +92,41 @@ nexora/
 - .NET SDK 10
 - Docker Desktop (PostgreSQL local y pruebas de integración)
 
-## Puesta en marcha
+## Correr en localhost
 
-### 1. Base de datos
+### Inicio rápido (Windows)
+
+Después de la configuración inicial (pasos 1 y 2 de abajo, una sola vez):
+
+```powershell
+./scripts/dev.ps1
+```
+
+El script:
+
+1. comprueba los requisitos;
+2. levanta PostgreSQL y MailPit en Docker;
+3. abre la API y la tienda en dos ventanas de PowerShell;
+4. espera a que respondan y abre el navegador.
+
+Para detener todo, cierra esas dos ventanas y ejecuta `docker compose stop`.
+
+| Qué | URL |
+| --- | --- |
+| Tienda | http://localhost:5173 |
+| Panel administrativo | http://localhost:5173/admin (con el usuario de `Seed:Admin:*`) |
+| Documentación de la API (Scalar) | http://localhost:5080/scalar |
+| Correos de desarrollo (MailPit) | http://localhost:8025 |
+
+Si PowerShell bloquea el script por la política de ejecución, usa
+`powershell -ExecutionPolicy Bypass -File scripts/dev.ps1`.
+
+Para probar el build de producción (PWA, service worker, CSP y páginas SEO): con la API corriendo,
+ejecuta `pnpm build && pnpm preview` en `frontend/` y abre http://localhost:4173.
+
+### Configuración inicial y arranque manual
+
+#### 1. Base de datos
 
 ```bash
 cp .env.example .env        # elige tu propia contraseña local
@@ -55,7 +137,7 @@ El contenedor expone PostgreSQL solo en `127.0.0.1:5433` (5433 para no chocar co
 instalado localmente). También levanta **MailPit**, que captura los correos de desarrollo
 (recuperación de contraseña): http://localhost:8025
 
-### 2. API
+#### 2. API
 
 La cadena de conexión es un secreto local y se guarda con `dotnet user-secrets`, nunca en `appsettings`:
 
@@ -77,7 +159,7 @@ valores guardados.
 - Documentación OpenAPI (Scalar): http://localhost:5080/scalar
 - Health check: http://localhost:5080/health
 
-### 3. Frontend
+#### 3. Frontend
 
 ```bash
 cd frontend
@@ -152,6 +234,7 @@ requiere la cabecera `X-XSRF-TOKEN`; los endpoints de auth tienen rate limiting 
 | `Seed:Admin:*`           | user-secrets       | Administrador inicial (solo Development)       |
 | `Frontend:BaseUrl`       | appsettings / entorno | URL pública de la tienda (enlaces de correo) |
 | `Frontend:AllowedCorsOrigins` | entorno       | Orígenes con CORS + credenciales (producción)  |
+| `ReverseProxy:KnownProxies` / `KnownNetworks` | entorno | Proxies de confianza para `X-Forwarded-*` (producción) |
 | `Frontend:IndexHtmlUrl`  | appsettings / entorno | `index.html` del build usado en las páginas SEO (por defecto `{BaseUrl}/index.html`) |
 | `Email:Smtp:*`           | appsettings / secretos | Servidor SMTP (`Password` siempre como secreto) |
 | `Shipping:*`             | appsettings        | Tarifas de envío y umbral de envío gratis      |

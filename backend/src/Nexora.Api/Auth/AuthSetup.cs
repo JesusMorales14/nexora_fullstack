@@ -121,7 +121,7 @@ public static class AuthSetup
                 });
             };
 
-            // Per client IP. Behind a reverse proxy this requires ForwardedHeaders (phase 11).
+            // Per client IP (the real one behind a trusted reverse proxy, see ReverseProxySetup).
             options.AddPolicy(AuthRateLimitPolicy, httpContext =>
                 RateLimitPartition.GetFixedWindowLimiter(
                     httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",

@@ -52,6 +52,7 @@ builder.Services.AddExceptionHandler<DomainExceptionHandler>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
 
+builder.Services.AddReverseProxySupport(builder.Configuration);
 builder.Services.AddInfrastructure();
 builder.Services.AddNexoraAuth(builder.Configuration, builder.Environment);
 
@@ -66,6 +67,8 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
+// First: client IP and scheme must be right for HTTPS redirection, cookies and rate limiting.
+app.UseForwardedHeaders();
 app.UseMiddleware<SecurityHeadersMiddleware>();
 
 // Unhandled exceptions become a generic 500 Problem Details: no stack traces leak to clients.
