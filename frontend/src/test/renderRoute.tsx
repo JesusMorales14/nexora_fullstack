@@ -5,10 +5,15 @@ import { RouterProvider } from 'react-router/dom'
 
 import { routes } from '@/app/router/routes'
 import { makeStore } from '@/app/store/store'
+import type { CartItem } from '@/features/cart/cartSlice'
+
+interface RenderRouteOptions {
+  cart?: CartItem[]
+}
 
 /** Renders the real route table at `path` with a fresh, isolated Redux store. */
-export function renderRoute(path: string) {
-  const store = makeStore()
+export function renderRoute(path: string, { cart = [] }: RenderRouteOptions = {}) {
+  const store = makeStore({ cart: { items: cart } })
   const router = createMemoryRouter(routes, { initialEntries: [path] })
 
   return {

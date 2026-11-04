@@ -3,8 +3,9 @@
 E-commerce de tecnología para el mercado peruano (precios en soles, IGV incluido).
 Proyecto de portafolio: storefront + panel administrativo sobre una API REST propia.
 
-> Estado: **Fases 1–5.** Catálogo con búsqueda, filtros y detalle; registro, login, recuperación de
-> contraseña, roles y dashboard admin protegido. Pendiente: carrito, checkout, CRUD admin.
+> Estado: **Fases 1–6.** Catálogo con búsqueda, filtros y detalle; cuentas con roles; carrito,
+> checkout con reserva de stock, pago simulado e historial de pedidos. Pendiente: CRUD admin,
+> tiempo real, PWA/SEO y despliegue.
 
 ## Stack
 
@@ -112,6 +113,11 @@ GitHub Actions ejecuta todo lo anterior en cada push y pull request.
 | POST   | `/api/v1/auth/forgot-password` | Envía el enlace de recuperación (siempre 202)                         |
 | POST   | `/api/v1/auth/reset-password`  | Cambia la contraseña con el token del correo                          |
 | GET    | `/api/v1/admin/summary`  | Indicadores del dashboard (rol Admin)                                       |
+| POST   | `/api/v1/cart/quote`     | Cotiza un carrito: precios, stock, envío (si hay `department`), total e IGV |
+| POST   | `/api/v1/checkout`       | Crea el pedido y reserva stock. Requiere sesión y `Idempotency-Key`         |
+| GET    | `/api/v1/orders`         | Pedidos del usuario                                                         |
+| GET    | `/api/v1/orders/{number}`| Detalle (404 si no es del usuario)                                          |
+| POST   | `/api/v1/orders/{number}/simulated-payment` | Aprueba/rechaza el pago (solo con la pasarela simulada) |
 
 Los errores se devuelven como Problem Details (RFC 9457) con `traceId`. Todo `POST/PUT/PATCH/DELETE`
 requiere la cabecera `X-XSRF-TOKEN`; los endpoints de auth tienen rate limiting por IP.
@@ -126,6 +132,9 @@ requiere la cabecera `X-XSRF-TOKEN`; los endpoints de auth tienen rate limiting 
 | `Frontend:BaseUrl`       | appsettings / entorno | URL pública de la tienda (enlaces de correo) |
 | `Frontend:AllowedCorsOrigins` | entorno       | Orígenes con CORS + credenciales (producción)  |
 | `Email:Smtp:*`           | appsettings / secretos | Servidor SMTP (`Password` siempre como secreto) |
+| `Shipping:*`             | appsettings        | Tarifas de envío y umbral de envío gratis      |
+| `Tax:IgvRate`            | appsettings        | Tasa de IGV (0.18)                             |
+| `Payments:*`             | appsettings        | Pasarela (`Fake`), ventana de pago, barrido de expiración |
 | `VITE_API_BASE_URL`      | `frontend/.env.local` | URL pública de la API (por defecto `/api/v1`) |
 
 Todo `VITE_*` termina en el navegador: nunca contiene secretos.
@@ -137,3 +146,4 @@ Todo `VITE_*` termina en el navegador: nunca contiene secretos.
 - [ADR-0003 — Herramientas de lint y versión de TypeScript](docs/adr/0003-lint-tooling-and-typescript-version.md)
 - [ADR-0004 — Arquitectura del catálogo](docs/adr/0004-catalog-architecture.md)
 - [ADR-0005 — Autenticación, sesiones y CSRF](docs/adr/0005-authentication-and-sessions.md)
+- [ADR-0006 — Carrito, checkout, stock y pagos](docs/adr/0006-cart-checkout-and-payments.md)

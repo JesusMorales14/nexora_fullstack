@@ -1,4 +1,4 @@
-import { LogOut, ShieldCheck } from 'lucide-react'
+import { LogOut, Package, ShieldCheck } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router'
 
@@ -45,6 +45,12 @@ export function AccountPage() {
       </section>
 
       <div className="flex flex-wrap gap-3">
+        <Button asChild variant="outline" size="lg">
+          <Link to="/account/orders">
+            <Package aria-hidden="true" />
+            Mis pedidos
+          </Link>
+        </Button>
         {isAdmin && (
           <Button asChild variant="outline" size="lg">
             <Link to="/admin">

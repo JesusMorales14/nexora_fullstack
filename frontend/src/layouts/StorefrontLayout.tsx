@@ -1,6 +1,6 @@
-﻿import { ShoppingCart } from 'lucide-react'
-import { Link, NavLink, Outlet, ScrollRestoration } from 'react-router'
+﻿import { Link, NavLink, Outlet, ScrollRestoration } from 'react-router'
 
+import { CartNavLink } from '@/features/cart/components/CartNavLink'
 import { SearchForm } from '@/features/products/components/SearchForm'
 import { AccountNavLink } from '@/layouts/AccountNavLink'
 import { cn } from '@/lib/utils/cn'
@@ -39,9 +39,7 @@ export function StorefrontLayout() {
               Catálogo
             </NavLink>
             <AccountNavLink className={navLinkClassName} />
-            <NavLink to="/cart" className={navLinkClassName} aria-label="Carrito de compras">
-              <ShoppingCart aria-hidden="true" className="size-5" />
-            </NavLink>
+            <CartNavLink className={navLinkClassName} />
           </nav>
         </div>
       </header>

@@ -90,6 +90,41 @@ export const routes: RouteObject[] = [
               (m) => m.AccountPage,
             ),
           },
+          {
+            path: 'account/orders',
+            lazy: lazyPage(
+              () => import('@/features/orders/pages/OrdersPage'),
+              (m) => m.OrdersPage,
+            ),
+          },
+          {
+            path: 'account/orders/:orderNumber',
+            lazy: lazyPage(
+              () => import('@/features/orders/pages/OrderPage'),
+              (m) => m.OrderPage,
+            ),
+          },
+          {
+            path: 'checkout',
+            lazy: lazyPage(
+              () => import('@/features/checkout/pages/CheckoutPage'),
+              (m) => m.CheckoutPage,
+            ),
+          },
+          {
+            path: 'checkout/pay/:orderNumber',
+            lazy: lazyPage(
+              () => import('@/features/checkout/pages/SimulatedPaymentPage'),
+              (m) => m.SimulatedPaymentPage,
+            ),
+          },
+          {
+            path: 'orders/:orderNumber/confirmation',
+            lazy: lazyPage(
+              () => import('@/features/orders/pages/OrderPage'),
+              (m) => m.OrderConfirmationPage,
+            ),
+          },
         ],
       },
       { path: '*', Component: NotFoundPage },

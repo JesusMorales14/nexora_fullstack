@@ -8,6 +8,7 @@ import { useGetProductBySlugQuery } from '@/features/products/api/productsApi'
 import { PriceTag } from '@/features/products/components/PriceTag'
 import { ProductGallery } from '@/features/products/components/ProductGallery'
 import { StockBadge } from '@/features/products/components/StockBadge'
+import { AddToCartForm } from '@/features/cart/components/AddToCartForm'
 import { VariantSelector } from '@/features/products/components/VariantSelector'
 import type { ProductDetails } from '@/features/products/types'
 import { getErrorMessage, getHttpStatus } from '@/lib/api/apiErrors'
@@ -117,6 +118,15 @@ function ProductDetailsView({ product }: ProductDetailsViewProps) {
               variants={product.variants}
               selectedVariantId={selectedVariant?.id ?? ''}
               onChange={setSelectedVariantId}
+            />
+          )}
+
+          {selectedVariant && (
+            <AddToCartForm
+              key={selectedVariant.id}
+              variantId={selectedVariant.id}
+              productName={product.name}
+              isInStock={selectedVariant.isInStock}
             />
           )}
 
