@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Nexora.Application.Catalog;
 using Nexora.Application.Checkout;
 using Nexora.Application.Common;
+using Nexora.Application.Realtime;
 using Nexora.Domain.Catalog;
 using Nexora.Domain.Ordering;
 using Nexora.Infrastructure.Persistence;
@@ -16,6 +17,7 @@ internal sealed class CheckoutService(
     IOptions<ShippingOptions> shippingOptions,
     IOptions<TaxOptions> taxOptions,
     IOptions<PaymentOptions> paymentOptions,
+    IRealtimeNotifier notifier,
     TimeProvider timeProvider) : ICheckoutService
 {
     private const int ExpirationBatchSize = 100;
@@ -228,7 +230,6 @@ internal sealed class CheckoutService(
         {
             await db.SaveChangesAsync(cancellationToken);
             await transaction.CommitAsync(cancellationToken);
-            return outcome;
         }
         catch (DbUpdateConcurrencyException)
         {
@@ -236,6 +237,34 @@ internal sealed class CheckoutService(
             // transaction rolls back, including the stock updates above.
             await transaction.RollbackAsync(cancellationToken);
             return PaymentConfirmationOutcome.NotPending;
+        }
+
+        // Only after the commit: never announce a change that could still roll back.
+        await notifier.OrderStatusChangedAsync(order.UserId, new OrderStatusChangedEvent(order.OrderNumber, order.Status.ToString(), now), cancellationToken);
+        if (outcome == PaymentConfirmationOutcome.Confirmed)
+        {
+            await notifier.OrderPaidAsync(new OrderPaidEvent(order.OrderNumber, order.Total, now), cancellationToken);
+            await NotifyLowStockAsync(order, now, cancellationToken);
+        }
+
+        return outcome;
+    }
+
+    /// <summary>Alerts administrators about variants this sale left at or below their threshold.</summary>
+    private async Task NotifyLowStockAsync(Order order, DateTimeOffset now, CancellationToken cancellationToken)
+    {
+        var variantIds = order.Items.Select(item => item.VariantId).ToList();
+        var lowStock = await (
+                from variant in db.ProductVariants.AsNoTracking()
+                join product in db.Products on variant.ProductId equals product.Id
+                where variantIds.Contains(variant.Id)
+                    && variant.Inventory.OnHand - variant.Inventory.Reserved <= variant.Inventory.LowStockThreshold
+                select new StockLowEvent(variant.Id, variant.Sku, product.Name, variant.Inventory.OnHand - variant.Inventory.Reserved, now))
+            .ToListAsync(cancellationToken);
+
+        foreach (var stockLow in lowStock)
+        {
+            await notifier.StockLowAsync(stockLow, cancellationToken);
         }
     }
 
@@ -262,6 +291,8 @@ internal sealed class CheckoutService(
                 await db.SaveChangesAsync(cancellationToken);
                 await transaction.CommitAsync(cancellationToken);
                 expired++;
+                await notifier.OrderStatusChangedAsync(
+                    order.UserId, new OrderStatusChangedEvent(order.OrderNumber, order.Status.ToString(), now), cancellationToken);
             }
             catch (DbUpdateConcurrencyException)
             {

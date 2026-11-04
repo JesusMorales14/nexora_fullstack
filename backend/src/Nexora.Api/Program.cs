@@ -4,8 +4,10 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Nexora.Api.Auth;
 using Nexora.Api.Common;
 using Nexora.Api.Configuration;
+using Nexora.Api.Realtime;
 using Nexora.Application.Checkout;
 using Nexora.Application.Common;
+using Nexora.Application.Realtime;
 using Nexora.Infrastructure;
 using Nexora.Infrastructure.Persistence;
 using Scalar.AspNetCore;
@@ -43,6 +45,9 @@ builder.Services.AddScoped<ICurrentUser, HttpCurrentUser>();
 builder.Services.AddInfrastructure();
 builder.Services.AddNexoraAuth(builder.Configuration, builder.Environment);
 
+builder.Services.AddSignalR();
+builder.Services.AddSingleton<IRealtimeNotifier, SignalRNotifier>();
+
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<NexoraDbContext>("database");
 
@@ -64,9 +69,13 @@ app.UseCors(AuthSetup.CorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
+app.UseMiddleware<HubOriginValidationMiddleware>();
 
 app.MapHealthChecks("/health");
 app.MapControllers();
+app.MapHub<NotificationsHub>(NotificationsHub.Path, options =>
+    // A long-lived connection must not outlive the session that opened it (logout, expiry).
+    options.CloseOnAuthenticationExpiration = true);
 
 await app.RunAsync();
 

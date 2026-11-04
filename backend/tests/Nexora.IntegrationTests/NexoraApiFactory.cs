@@ -1,5 +1,9 @@
+using System.Net;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.Mvc.Testing.Handlers;
+using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -56,13 +60,32 @@ public sealed class NexoraApiFactory : WebApplicationFactory<Program>, IAsyncLif
     }
 
     /// <summary>A browser-like client: its own cookie jar, HTTPS so Secure/__Host- cookies are kept.</summary>
-    public ApiSession CreateSession() =>
-        new(CreateClient(new WebApplicationFactoryClientOptions
+    public ApiSession CreateSession()
+    {
+        var cookies = new CookieContainer();
+        var client = new HttpClient(new CookieContainerHandler(cookies) { InnerHandler = Server.CreateHandler() })
         {
             BaseAddress = new Uri("https://localhost"),
-            HandleCookies = true,
-            AllowAutoRedirect = false,
-        }));
+        };
+        return new ApiSession(client, cookies);
+    }
+
+    /// <summary>
+    /// Opens the notifications hub with the session's cookies (long polling: the in-memory test
+    /// server has no real sockets). The caller registers handlers before calling StartAsync.
+    /// </summary>
+    public HubConnection CreateHubConnection(ApiSession session)
+    {
+        ArgumentNullException.ThrowIfNull(session);
+
+        return new HubConnectionBuilder()
+            .WithUrl(new Uri("https://localhost/hubs/notifications"), options =>
+            {
+                options.Transports = HttpTransportType.LongPolling;
+                options.HttpMessageHandlerFactory = _ => new CookieContainerHandler(session.Cookies) { InnerHandler = Server.CreateHandler() };
+            })
+            .Build();
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {

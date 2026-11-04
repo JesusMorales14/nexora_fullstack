@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Json;
 using Nexora.Api.Auth;
 
@@ -6,11 +7,14 @@ namespace Nexora.IntegrationTests.Support;
 /// <summary>
 /// Behaves like the SPA: keeps cookies, fetches an antiforgery token and sends it on unsafe requests.
 /// </summary>
-public sealed class ApiSession(HttpClient client) : IDisposable
+public sealed class ApiSession(HttpClient client, CookieContainer? cookies = null) : IDisposable
 {
     private string? _csrfToken;
 
     public HttpClient Client => client;
+
+    /// <summary>The session's cookie jar, shared with SignalR connections of the same "browser".</summary>
+    public CookieContainer Cookies => cookies ?? throw new InvalidOperationException("This session was created without an accessible cookie jar.");
 
     private static CancellationToken CancellationToken => TestContext.Current.CancellationToken;
 

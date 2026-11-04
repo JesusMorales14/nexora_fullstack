@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Nexora.Application.Admin;
 using Nexora.Application.Auth;
 using Nexora.Application.Common;
+using Nexora.Application.Realtime;
 using Nexora.Domain.Common;
 using Nexora.Domain.Ordering;
 using Nexora.Infrastructure.Identity;
@@ -18,6 +19,7 @@ internal sealed class AdminOperationsService(
     UserManager<ApplicationUser> userManager,
     AuditTrail audit,
     ICurrentUser currentUser,
+    IRealtimeNotifier notifier,
     TimeProvider timeProvider) : IAdminOperationsService
 {
     private const int MaxExportRows = 10_000;
@@ -128,6 +130,9 @@ internal sealed class AdminOperationsService(
             await transaction.RollbackAsync(cancellationToken);
             return CommandResult.Conflict<AdminOrderDetails>("El pedido cambió mientras lo editabas. Recarga la página.");
         }
+
+        await notifier.OrderStatusChangedAsync(
+            order.UserId, new OrderStatusChangedEvent(order.OrderNumber, order.Status.ToString(), now), cancellationToken);
 
         var details = await GetOrderAsync(orderNumber, cancellationToken);
         return details is null ? CommandResult.NotFound<AdminOrderDetails>() : CommandResult.Ok(details);
