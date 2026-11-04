@@ -79,6 +79,8 @@ public sealed class NexoraApiFactory : WebApplicationFactory<Program>, IAsyncLif
         builder.UseSetting($"{DependencyInjection.AdminSeedSectionName}:Password", AdminPassword);
         // All test requests share one client IP; rate limiting has its own dedicated test.
         builder.UseSetting("RateLimiting:Auth:PermitLimit", "10000");
+        // The expiration sweep is exercised directly by its test, not on a background timer.
+        builder.UseSetting("Payments:ExpirationSweepEnabled", "false");
 
         builder.ConfigureTestServices(services =>
         {

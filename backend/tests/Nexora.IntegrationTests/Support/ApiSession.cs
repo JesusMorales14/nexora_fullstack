@@ -24,7 +24,11 @@ public sealed class ApiSession(HttpClient client) : IDisposable
     public Task<HttpResponseMessage> GetAsync(string path) =>
         client.GetAsync(new Uri(path, UriKind.Relative), CancellationToken);
 
-    public async Task<HttpResponseMessage> PostAsync<T>(string path, T body, bool includeCsrfToken = true)
+    public async Task<HttpResponseMessage> PostAsync<T>(
+        string path,
+        T body,
+        bool includeCsrfToken = true,
+        IReadOnlyDictionary<string, string>? headers = null)
     {
         if (includeCsrfToken && _csrfToken is null)
         {
@@ -39,6 +43,11 @@ public sealed class ApiSession(HttpClient client) : IDisposable
         if (includeCsrfToken)
         {
             request.Headers.Add(AuthSetup.CsrfHeaderName, _csrfToken);
+        }
+
+        foreach (var (name, value) in headers ?? new Dictionary<string, string>())
+        {
+            request.Headers.Add(name, value);
         }
 
         return await client.SendAsync(request, CancellationToken);

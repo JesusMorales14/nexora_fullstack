@@ -8,9 +8,13 @@ namespace Nexora.IntegrationTests.Catalog;
 
 public sealed class ProductsEndpointTests(NexoraApiFactory factory)
 {
-    // Seed facts (CatalogSeeder): 15 published products + 1 unpublished draft.
-    private const int PublishedProductCount = 15;
+    // Seed facts (CatalogSeeder). Other tests add their own products to the shared database, so
+    // counts are asserted inside seeded categories, which no other test writes to:
+    // "computadoras" = 4 published laptops + 3 monitors (+ 1 unpublished draft laptop).
+    private const string SeededCategory = "computadoras";
+    private const int PublishedInSeededCategory = 7;
     private const string DraftSlug = "lenovo-legion-pro-7";
+    private static readonly string[] SeededBrandSlugs = ["asus", "hp", "lenovo", "lg", "logitech", "redragon", "samsung", "sony"];
     private const string OutOfStockSlug = "asus-rog-strix-g16";
     private static readonly string[] PeripheralSubcategorySlugs = ["teclados", "mouse"];
 
@@ -30,11 +34,11 @@ public sealed class ProductsEndpointTests(NexoraApiFactory factory)
     [Fact]
     public async Task ListReturnsOnlyPublishedProductsPaginated()
     {
-        var page = await ListAsync("?pageSize=10");
+        var page = await ListAsync($"?category={SeededCategory}&pageSize=5");
 
-        Assert.Equal(PublishedProductCount, page.TotalCount);
+        Assert.Equal(PublishedInSeededCategory, page.TotalCount);
         Assert.Equal(2, page.TotalPages);
-        Assert.Equal(10, page.Items.Count);
+        Assert.Equal(5, page.Items.Count);
         Assert.DoesNotContain(page.Items, product => product.Slug == DraftSlug);
         Assert.All(page.Items, product => Assert.Equal("PEN", product.Currency));
     }
@@ -42,11 +46,11 @@ public sealed class ProductsEndpointTests(NexoraApiFactory factory)
     [Fact]
     public async Task PagesDoNotOverlap()
     {
-        var first = await ListAsync("?pageSize=8&page=1&sort=name_asc");
-        var second = await ListAsync("?pageSize=8&page=2&sort=name_asc");
+        var first = await ListAsync($"?category={SeededCategory}&pageSize=4&page=1&sort=name_asc");
+        var second = await ListAsync($"?category={SeededCategory}&pageSize=4&page=2&sort=name_asc");
 
         Assert.Empty(first.Items.Select(p => p.Id).Intersect(second.Items.Select(p => p.Id)));
-        Assert.Equal(PublishedProductCount, first.Items.Count + second.Items.Count);
+        Assert.Equal(PublishedInSeededCategory, first.Items.Count + second.Items.Count);
     }
 
     [Fact]
@@ -150,6 +154,6 @@ public sealed class ProductsEndpointTests(NexoraApiFactory factory)
             new Uri("/api/v1/brands", UriKind.Relative), CancellationToken);
 
         Assert.Contains(categories!, category => category is { Slug: "teclados", ParentSlug: "perifericos" });
-        Assert.Equal(8, brands!.Count);
+        Assert.Subset(brands!.Select(brand => brand.Slug).ToHashSet(), SeededBrandSlugs.ToHashSet());
     }
 }

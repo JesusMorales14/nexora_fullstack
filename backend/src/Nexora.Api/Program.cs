@@ -1,6 +1,9 @@
+using System.Text.Json.Serialization;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 using Nexora.Api.Auth;
 using Nexora.Api.Configuration;
+using Nexora.Application.Checkout;
 using Nexora.Infrastructure;
 using Nexora.Infrastructure.Persistence;
 using Scalar.AspNetCore;
@@ -8,12 +11,14 @@ using Scalar.AspNetCore;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers(options =>
-{
-    // CSRF defense for cookie auth: every POST/PUT/PATCH/DELETE must carry a valid antiforgery token.
-    options.Filters.Add<AntiforgeryValidationFilter>();
-    // Validation error keys use the JSON (camelCase) names the client sends, e.g. "password".
-    options.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider());
-});
+    {
+        // CSRF defense for cookie auth: every POST/PUT/PATCH/DELETE must carry a valid antiforgery token.
+        options.Filters.Add<AntiforgeryValidationFilter>();
+        // Validation error keys use the JSON (camelCase) names the client sends, e.g. "password".
+        options.ModelMetadataDetailsProviders.Add(new SystemTextJsonValidationMetadataProvider());
+    })
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+builder.Services.AddValidatorsFromAssemblyContaining<CheckoutRequestValidator>();
 builder.Services.AddOpenApi();
 
 // RFC 9457 Problem Details for every error response (validation, 404, unhandled exceptions).

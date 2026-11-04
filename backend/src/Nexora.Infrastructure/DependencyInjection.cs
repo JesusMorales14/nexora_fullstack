@@ -6,10 +6,14 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Nexora.Application.Admin;
 using Nexora.Application.Auth;
 using Nexora.Application.Catalog;
+using Nexora.Application.Checkout;
+using Nexora.Application.Orders;
 using Nexora.Infrastructure.Admin;
 using Nexora.Infrastructure.Catalog;
 using Nexora.Infrastructure.Email;
 using Nexora.Infrastructure.Identity;
+using Nexora.Infrastructure.Ordering;
+using Nexora.Infrastructure.Payments;
 using Nexora.Infrastructure.Persistence;
 using Nexora.Infrastructure.Persistence.Seeding;
 
@@ -39,9 +43,20 @@ public static class DependencyInjection
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        services.AddOptions<ShippingOptions>().BindConfiguration(ShippingOptions.SectionName);
+        services.AddOptions<TaxOptions>().BindConfiguration(TaxOptions.SectionName);
+        services.AddOptions<PaymentOptions>()
+            .BindConfiguration(PaymentOptions.SectionName)
+            .Validate(options => options.IsFakeProvider, "Only the simulated payment provider is implemented (Payments:Provider = Fake).")
+            .ValidateOnStart();
+
         services.AddScoped<IProductCatalog, ProductCatalog>();
         services.AddScoped<IAdminDashboard, AdminDashboard>();
         services.AddScoped<IAccountEmailSender, SmtpAccountEmailSender>();
+        services.AddScoped<ICheckoutService, CheckoutService>();
+        services.AddScoped<IOrderQueries, OrderQueries>();
+        services.AddSingleton<IPaymentGateway, SimulatedPaymentGateway>();
+        services.AddHostedService<PendingOrderExpirationService>();
 
         return services;
     }
