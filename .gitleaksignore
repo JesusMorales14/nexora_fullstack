@@ -2,4 +2,4 @@
 #
 # Fixed password for throwaway accounts the E2E tests register on a local/CI database. It protects
 # nothing; since then the password is generated per run (frontend/e2e/support.ts).
-726c37c4b6fe9753bdd2ba9eef6b3f721fa3e5f2:frontend/e2e/support.ts:generic-api-key:8
+71001833d93a2721ec8eb5e5e6b412f51b0b323a:frontend/e2e/support.ts:generic-api-key:8
