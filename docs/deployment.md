@@ -13,7 +13,7 @@ documento reúne lo que ya está preparado y lo que falta para publicarlo cuando
 | Proxy inverso | `ReverseProxy:KnownProxies` (IPs) o `ReverseProxy:KnownNetworks` (CIDR) para confiar en `X-Forwarded-For/Proto`. Sin esto, el rate limiting vería a todos los clientes con la IP del proxy y las cookies `Secure` fallarían detrás de un proxy que termina TLS |
 | Claves de Data Protection | Se guardan en PostgreSQL: las sesiones sobreviven a reinicios y a varias instancias |
 | Secretos | Ninguno en el repositorio. En producción van como variables de entorno o en el gestor de secretos del proveedor |
-| CI | GitHub Actions: lint, tipos, pruebas, E2E, auditoría de dependencias y gitleaks. Sin verificar en GitHub hasta que el repositorio tenga un remoto |
+| CI | GitHub Actions: lint, tipos, pruebas, E2E, auditoría de dependencias y gitleaks. Pasa en [GitHub](https://github.com/JesusMorales14/nexora_fullstack/actions) |
 
 ## Lo que debe hacer el host de la tienda
 
@@ -96,7 +96,7 @@ el primer administrador se crea a mano.
 ## Pendientes antes de publicar
 
 - [ ] Elegir el proveedor (VPS con Docker, Render/Railway o Azure).
-- [ ] Crear el remoto en GitHub y comprobar que el CI pasa allí.
+- [x] Crear el remoto en GitHub y comprobar que el CI pasa allí.
 - [ ] Dockerfiles o configuración del proveedor, según la opción elegida.
 - [ ] Pasarela de pagos real (Mercado Pago u otra) antes de aceptar dinero.
 - [ ] Copias de seguridad de PostgreSQL y monitoreo (logs, health check `/health`).
