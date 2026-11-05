@@ -15,6 +15,8 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: isCi,
   retries: isCi ? 1 : 0,
+  // Whole-run ceiling: if anything hangs (a server, a browser), fail with a report instead of waiting.
+  globalTimeout: isCi ? 20 * 60_000 : undefined,
   reporter: isCi ? [['github'], ['html', { open: 'never' }]] : 'list',
   // Pages load lazy chunks plus API data while several browsers run in parallel: 5s (the default)
   // causes false failures under load. Assertions still pass as soon as the condition holds.
