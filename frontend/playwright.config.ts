@@ -35,18 +35,22 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: 'dotnet run --project ../backend/src/Nexora.Api --launch-profile http',
+      // CI compiles the API in an earlier step: `dotnet run` building here leaves MSBuild/compiler
+      // server processes holding the output open, and Playwright then never finishes its teardown.
+      command: `dotnet run ${isCi ? '--no-build ' : ''}--project ../backend/src/Nexora.Api --launch-profile http`,
       url: API_HEALTH_URL,
       // Product pages are rendered by the API from the built index.html served by `vite preview`.
       env: { Frontend__IndexHtmlUrl: `${PREVIEW_URL}/index.html` },
       reuseExistingServer: !isCi,
       timeout: SERVER_START_TIMEOUT_MS,
+      gracefulShutdown: { signal: 'SIGTERM', timeout: 10_000 },
     },
     {
       command: 'pnpm build && pnpm preview --port 4173 --strictPort',
       url: PREVIEW_URL,
       reuseExistingServer: !isCi,
       timeout: SERVER_START_TIMEOUT_MS,
+      gracefulShutdown: { signal: 'SIGTERM', timeout: 10_000 },
     },
   ],
 })
